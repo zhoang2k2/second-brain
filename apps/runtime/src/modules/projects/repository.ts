@@ -16,6 +16,24 @@ interface VaultRow {
   created_at: string;
 }
 
+export interface ProcessedCommandRow {
+  idempotency_key: string;
+  request_id: string;
+  command_name: string;
+  payload_hash: string;
+  result: string;
+  created_at: string;
+}
+
+export interface ProcessedCommandRecord {
+  idempotencyKey: string;
+  requestId: string;
+  commandName: string;
+  payloadHash: string;
+  result: string;
+  createdAt: string;
+}
+
 export class ProjectRepository {
   saveProject(db: Database.Database, project: Project): void {
     const stmt = db.prepare(`
@@ -120,5 +138,43 @@ export class ProjectRepository {
       version: row.version,
       createdAt: row.created_at
     }));
+  }
+
+  saveProcessedCommand(db: Database.Database, record: ProcessedCommandRecord): void {
+    const stmt = db.prepare(`
+      INSERT INTO processed_commands (idempotency_key, request_id, command_name, payload_hash, result, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    stmt.run(
+      record.idempotencyKey,
+      record.requestId,
+      record.commandName,
+      record.payloadHash,
+      record.result,
+      record.createdAt
+    );
+  }
+
+  findProcessedCommand(db: Database.Database, idempotencyKey: string): ProcessedCommandRecord | null {
+    const stmt = db.prepare(`
+      SELECT idempotency_key, request_id, command_name, payload_hash, result, created_at
+      FROM processed_commands
+      WHERE idempotency_key = ?
+    `);
+    const row = stmt.get(idempotencyKey) as ProcessedCommandRow | undefined;
+    if (!row) return null;
+    return {
+      idempotencyKey: row.idempotency_key,
+      requestId: row.request_id,
+      commandName: row.command_name,
+      payloadHash: row.payload_hash,
+      result: row.result,
+      createdAt: row.created_at
+    };
+  }
+
+  deleteProcessedCommand(db: Database.Database, idempotencyKey: string): void {
+    const stmt = db.prepare('DELETE FROM processed_commands WHERE idempotency_key = ?');
+    stmt.run(idempotencyKey);
   }
 }

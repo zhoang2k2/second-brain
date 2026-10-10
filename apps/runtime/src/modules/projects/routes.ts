@@ -27,12 +27,12 @@ export const projectRoutes: FastifyPluginAsync<ProjectRoutesOptions> = async (fa
   const handleRegisterProject = async (request: FastifyRequest, reply: FastifyReply) => {
     const command = RegisterProjectCommandSchema.safeParse(request.body);
     if (!command.success) return invalidCommand(reply);
-    return reply.send(await service.registerProject(command.data.payload));
+    return reply.send(await service.registerProject(command.data));
   };
   const handleRegisterVault = async (request: FastifyRequest, reply: FastifyReply) => {
     const command = RegisterVaultCommandSchema.safeParse(request.body);
     if (!command.success) return invalidCommand(reply);
-    return reply.send(await service.registerVault(command.data.payload));
+    return reply.send(await service.registerVault(command.data));
   };
 
   // Support both POST /v1/commands/<name> and POST /v1/<name>

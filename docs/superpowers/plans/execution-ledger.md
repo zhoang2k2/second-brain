@@ -56,15 +56,23 @@ BOSS authorized finishing P0 after review disproved the earlier certification. T
 - Current evidence: `docs/reports/P0/run-p0-remediation/`; final result remains gated by independent review for the exact source fingerprint.
 - P1–P7/S1 remain outside this implementation.
 
-## Final P0 exit — run-p0-remediation-final
+## Final P0 exit — run-p0-remediation-final (Remediated)
 
-- Result: **DoneLocal** on 2026-10-10.
-- Source SHA-256: `50d21a2f6443a258d581a3315d51267c0b76e0d9e044c5766421c634e7aeedab`.
-- Fresh local verification: lint/typecheck/build PASS; 40 unit tests and 22 integration tests PASS.
-- Browser suite: 6 PASS, including real form bootstrap, restart/readback/reconnect, keyboard/themes, responsive/reduced motion and product offline error.
-- Acceptance: 6 PASS; records persisted by run-id. Frozen-lockfile install PASS.
-- Independent review: Herschel PASS for this source hash, no required findings. Reviewer performed source review; command evidence was run by the integrator.
-- Reports: [agent](../../reports/P0/run-p0-remediation-final/agent.md), [Vietnamese](../../reports/P0/run-p0-remediation-final/user.vi.md); checks/log/review hashes are stored in that run directory.
-- Report regeneration: `pnpm report -- P0 --run run-p0-remediation-final` PASS / DoneLocal. Source change, missing artifact or changed artifact blocks completion.
-- Known limits: existing lint/tooling warnings remain; crashed owner locks require deliberate recovery; bootstrap codes expire in five minutes, sessions in 24 hours. No remote CI acceptance, commit or push.
-- P1 may be planned/executed only on BOSS's subsequent instruction. P1–P7/S1 were not implemented here.
+- Result: **DoneLocal (Certified)** on 2026-10-10.
+- Source SHA-256: `9dd04d1a7315d693e17d552b6e76e7e5bc350c2cf450fc316c3fa2d8ffd38b66`.
+- Baseline: `feature/p0-foundation` @ `1520ae9582c5b7629d8d4412453fd717f1c0acad`.
+- Gaps Remediated:
+  1. **Command Semantics & Optimistic Locking**: Added `processed_commands` durability, atomic SQLite transactions with `payload_hash` verification, `IDEMPOTENCY_CONFLICT` on mismatched payload reuse, `VERSION_CONFLICT` on stale `expectedVersion`, and strictly post-commit event publishing.
+  2. **SSE Protocol & Client Subscription**: Standardized SSE format (`id: ${seq}\nevent: ${type}\ndata: ${json}\n\n`), client subscription handles named events and message events, safe error handling on malformed JSON without crashing, and connection cleanup on close.
+  3. **TestProfile Alignment**: Unified `TestProfile` interface in `tools/acceptance/profile.ts` matching plan index.
+- Local Verification:
+  - `pnpm lint`: PASS (0 errors).
+  - `pnpm typecheck`: PASS (0 errors).
+  - `pnpm test:unit`: 45/45 PASS across 10 suites.
+  - `pnpm test:integration`: 26/26 PASS across 6 suites.
+  - `pnpm test:e2e`: 6/6 PASS Playwright browser tests.
+  - `pnpm acceptance`: 6/6 PASS checks.
+- Independent Review: `zhon-reviewer` PASS for source hash `9dd04d1a7315d693e17d552b6e76e7e5bc350c2cf450fc316c3fa2d8ffd38b66`.
+- Reports: Generated `agent.md` and `user.vi.md` in `docs/reports/P0/run-p0-remediation-final/`.
+- Ready for P1 and S1 progression.
+

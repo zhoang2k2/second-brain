@@ -142,27 +142,53 @@ export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
       request: FastifyRequest<{ Querystring: { after?: string } }>,
       reply: FastifyReply
     ) => {
+      reply.hijack();
+
       const query = request.query;
-      const afterSequence = query?.after ? parseInt(query.after, 10) : 0;
+      const lastEventId = request.headers['last-event-id'];
+      const rawAfter = query?.after ?? (typeof lastEventId === 'string' ? lastEventId : undefined);
+      const parsedAfter = rawAfter ? parseInt(rawAfter, 10) : 0;
+      const afterSequence = Number.isNaN(parsedAfter) ? 0 : parsedAfter;
+
+      const origin = request.headers.origin;
+      if (origin && sessionManager.validateOrigin(origin)) {
+        reply.raw.setHeader('Access-Control-Allow-Origin', origin);
+        reply.raw.setHeader('Access-Control-Allow-Credentials', 'true');
+      }
 
       reply.raw.setHeader('Content-Type', 'text/event-stream');
       reply.raw.setHeader('Cache-Control', 'no-cache');
       reply.raw.setHeader('Connection', 'keep-alive');
+      if (typeof reply.raw.flushHeaders === 'function') {
+        reply.raw.flushHeaders();
+      }
+
+      const formatEvent = (evt: { sequence: number; type: string; [key: string]: unknown }) => {
+        const type = evt.type || 'message';
+        return `id: ${evt.sequence}\nevent: ${type}\ndata: ${JSON.stringify(evt)}\n\n`;
+      };
 
       // Send existing historical events after sequence
       const existingEvents = eventStore.getEvents(deps.store.connection, afterSequence);
       for (const evt of existingEvents) {
-        reply.raw.write(`id: ${evt.sequence}\nevent: ${evt.type}\ndata: ${JSON.stringify(evt)}\n\n`);
+        if (!reply.raw.destroyed && !reply.raw.writableEnded) {
+          reply.raw.write(formatEvent(evt));
+        }
       }
 
       // Subscribe to new real-time events
       const unsubscribe = eventStore.subscribe(evt => {
-        reply.raw.write(`id: ${evt.sequence}\nevent: ${evt.type}\ndata: ${JSON.stringify(evt)}\n\n`);
+        if (!reply.raw.destroyed && !reply.raw.writableEnded) {
+          reply.raw.write(formatEvent(evt));
+        }
       });
 
-      request.raw.on('close', () => {
+      const cleanup = () => {
         unsubscribe();
-      });
+      };
+
+      request.raw.on('close', cleanup);
+      reply.raw.on('close', cleanup);
     }
   );
 

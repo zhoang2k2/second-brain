@@ -140,24 +140,56 @@ export function createApiClient(config: ApiClientConfig = {}): ApiClient {
   }
 
   function subscribe(after: number, onEvent: (event: RuntimeEvent<unknown>) => void): () => void {
-    if (typeof window === 'undefined') {
+    const EventSourceConstructor =
+      typeof EventSource !== 'undefined'
+        ? EventSource
+        : typeof window !== 'undefined' && window.EventSource
+          ? window.EventSource
+          : undefined;
+
+    if (!EventSourceConstructor) {
       return () => {};
     }
 
-    const url = `${baseUrl}/events?after=${after}`;
-    const eventSource = new EventSource(url);
+    const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const url = `${cleanBaseUrl}/events?after=${after}`;
+    const eventSource = new EventSourceConstructor(url);
 
-    eventSource.onmessage = (e) => {
+    const handleEvent = (e: MessageEvent) => {
       try {
+        if (!e || typeof e.data !== 'string' || e.data.trim() === '') {
+          return;
+        }
         const parsed = JSON.parse(e.data);
-        onEvent(parsed);
+        if (parsed && typeof parsed === 'object') {
+          onEvent(parsed as RuntimeEvent<unknown>);
+        }
       } catch {
-        // ignore malformed events
+        // safely ignore malformed JSON events without crashing or throwing
       }
     };
 
+    const handleNamed = (e: Event) => handleEvent(e as MessageEvent);
+
+    if (typeof eventSource.addEventListener === 'function') {
+      eventSource.addEventListener('project.registered', handleNamed);
+      eventSource.addEventListener('vault.registered', handleNamed);
+    }
+    eventSource.onmessage = handleEvent;
+
     return () => {
-      eventSource.close();
+      try {
+        if (typeof eventSource.removeEventListener === 'function') {
+          eventSource.removeEventListener('project.registered', handleNamed);
+          eventSource.removeEventListener('vault.registered', handleNamed);
+        }
+        eventSource.onmessage = null;
+        if (typeof eventSource.close === 'function') {
+          eventSource.close();
+        }
+      } catch {
+        // Safe cleanup
+      }
     };
   }
 

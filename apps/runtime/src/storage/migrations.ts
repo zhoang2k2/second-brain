@@ -25,6 +25,15 @@ CREATE TABLE IF NOT EXISTS events (
   occurred_at TEXT NOT NULL,
   payload TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS processed_commands (
+  idempotency_key TEXT PRIMARY KEY,
+  request_id TEXT NOT NULL,
+  command_name TEXT NOT NULL,
+  payload_hash TEXT NOT NULL,
+  result TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 `;
 
 export function runMigrations(db: Database.Database): number {
