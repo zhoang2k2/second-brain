@@ -1,44 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zhon — local second brain
 
-## Getting Started
+P0 provides a protected local runtime, SQLite registration, shell/settings and a thin CLI. Knowledge ingestion/chat/execution belong to later phases.
 
-First, run the development server:
+## Start locally
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Use Node 22.19.0 and pnpm 10.24.0.
+
+```sh
+pnpm install --frozen-lockfile
+ZHON_ALLOWED_ROOTS=/absolute/project-parent,/absolute/vault-parent apps/cli/bin/zhon start
+apps/cli/bin/zhon status
+pnpm --filter @zhon/web dev --hostname 127.0.0.1 --port 3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://127.0.0.1:3000. Enter `browserBootstrapCode` from the local private descriptor `~/.zhon/runtime.json` into **Connect runtime**. Do not share the descriptor or paste it into logs/chat. Browser and CLI bootstrap codes are separate, one-use and expire after five minutes; restart the runtime if an unused code expires. Browser authentication uses an HttpOnly, SameSite=Strict cookie. CLI reuses its private session file across separate commands.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+apps/cli/bin/zhon project register /absolute/project-parent/project
+apps/cli/bin/zhon vault register /absolute/vault-parent/notes
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+No configured `ZHON_ALLOWED_ROOTS` means registration is denied. Configure allowed roots before starting the runtime. Runtime defaults to 127.0.0.1:4100; descriptor/database live under `~/.zhon`. `ZHON_DB_PATH`, `ZHON_RUNTIME_STATE`, `ZHON_PORT` and `ZHON_RUNTIME_URL` support isolated test instances. If using a different runtime port, include its origin and the web origin in `ZHON_ALLOWED_ORIGINS`. Proxy uses `ZHON_RUNTIME_URL`.
 
-## Learn More
+To stop the runtime, send SIGTERM to the PID in the descriptor. Restart invalidates old sessions: reconnect the browser; CLI creates a fresh session on its next registration. Sessions expire after 24 hours; restart/reconnect to renew them in P0.
 
-To learn more about Next.js, take a look at the following resources:
+An atomic lock denies another owner of the same canonical database. After an unclean crash, stop/verify the recorded owner before deliberately recovering the `.lock` file; P0 does not silently reclaim ambiguous locks.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Validate and report
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```sh
+pnpm verify
+pnpm exec playwright install chromium
+pnpm test:e2e
+pnpm acceptance -- P0 --profile fixture-local --run my-p0-run
+pnpm validate:p0 my-p0-run
+```
 
-## Deploy on Vercel
+The validator stores logs, acceptance records and a source fingerprint under `docs/reports/P0/<run>/`. Independent review must supply a matching `review.json` before the report can become DoneLocal. `pnpm report -- P0 --run my-p0-run` regenerates reports from recorded evidence without rerunning app actions. Missing gates/artifacts or changed source block completion. Validation does not commit/push or assert remote CI passed.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain

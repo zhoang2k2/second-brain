@@ -1,0 +1,11 @@
+{
+  "name": "@zhon/runtime",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/better-sqlite3": "9.6.0",
+    "@zhon/contracts": "workspace:*",
+    "better-sqlite3": "13.0.3",
+    "fastify": "5.12.5"
+  }
+}
