@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+
+const tsxPath = path.resolve(__dirname, '../../../node_modules/.bin/tsx');
+const mainPath = path.resolve(__dirname, '../src/main.ts');
+
+const result = spawnSync(tsxPath, [mainPath, ...process.argv.slice(2)], {
+  stdio: 'inherit',
+  env: process.env
+});
+
+process.exit(result.status ?? 0);

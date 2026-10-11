@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F4F5F6;
+  --foreground: #111316;
+}
+
+[data-theme="dark"] {
+  --background: #0D0F11;
+  --foreground: #EAECEF;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar visual hiding while preserving functionality */
+.zhon-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.zhon-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

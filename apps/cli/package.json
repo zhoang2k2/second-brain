@@ -1,0 +1,15 @@
+{
+  "name": "@zhon/cli",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "zhon": "./bin/zhon"
+  },
+  "dependencies": {
+    "@zhon/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "typescript": "5.9.3"
+  }
+}

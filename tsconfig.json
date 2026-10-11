@@ -15,20 +15,26 @@
     "incremental": true,
     "plugins": [
       {
-        "name": "next"
+        "name": "next",
+        "dir": "./apps/web"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@zhon/contracts": ["./packages/contracts/src/index.ts"],
+      "@/*": ["./apps/web/*"]
     }
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "apps/web/**/*.ts",
+    "apps/web/**/*.tsx",
+    "packages/**/*.ts",
+    "scripts/**/*.ts",
+    "tools/**/*.ts",
+    "tests/**/*.ts",
+    "apps/runtime/**/*.ts",
+    "apps/cli/**/*.ts",
+    ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "apps/web/.next"]
 }
