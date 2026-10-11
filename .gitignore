@@ -13,7 +13,8 @@ node_modules/
 # testing
 coverage/
 test-results/
-reports/
+/reports/
+!docs/reports/
 
 # next.js
 .next/

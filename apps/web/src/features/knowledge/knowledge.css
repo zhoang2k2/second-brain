@@ -1,0 +1,84 @@
+/* Zhon UI v5 Knowledge Review Stylesheet */
+/* Colors: Light (#0B6FB8 Sky / #5A7400 Lime) / Dark (#4DB2FF Sky / #B6D94A Lime) */
+
+:root {
+  --zhon-bg: #F4F5F6;
+  --zhon-surface: #E6E8EA;
+  --zhon-text-primary: #111316;
+  --zhon-text-secondary: #595E66;
+  --zhon-sky: #0B6FB8;
+  --zhon-lime: #5A7400;
+  --zhon-border: rgba(0, 0, 0, 0.08);
+  --zhon-diff-added-bg: rgba(90, 116, 0, 0.12);
+  --zhon-diff-removed-bg: rgba(239, 68, 68, 0.12);
+  --zhon-font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --zhon-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --zhon-bg: #0D0F11;
+    --zhon-surface: #181B1F;
+    --zhon-text-primary: #EAECEF;
+    --zhon-text-secondary: #8B9199;
+    --zhon-sky: #4DB2FF;
+    --zhon-lime: #B6D94A;
+    --zhon-border: rgba(255, 255, 255, 0.08);
+    --zhon-diff-added-bg: rgba(182, 217, 74, 0.15);
+    --zhon-diff-removed-bg: rgba(248, 113, 113, 0.15);
+  }
+}
+
+[data-theme='dark'] {
+  --zhon-bg: #0D0F11;
+  --zhon-surface: #181B1F;
+  --zhon-text-primary: #EAECEF;
+  --zhon-text-secondary: #8B9199;
+  --zhon-sky: #4DB2FF;
+  --zhon-lime: #B6D94A;
+  --zhon-border: rgba(255, 255, 255, 0.08);
+  --zhon-diff-added-bg: rgba(182, 217, 74, 0.15);
+  --zhon-diff-removed-bg: rgba(248, 113, 113, 0.15);
+}
+
+/* Accessibility: Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-reduced-motion='true'] *,
+[data-reduced-motion='true'] *::before,
+[data-reduced-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Hide scrollbars visually while retaining mouse and keyboard scrolling */
+.zhon-scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.zhon-scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Accordion and drawer smooth transitions */
+.zhon-accordion-content {
+  transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-in-out;
+}
+
+/* 8-point grid container utility */
+.zhon-knowledge-grid {
+  display: grid;
+  gap: 24px;
+}

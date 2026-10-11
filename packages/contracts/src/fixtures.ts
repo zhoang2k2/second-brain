@@ -61,3 +61,5 @@ export const apiErrorFixture: ApiError = {
   message: 'Invalid input provided',
   retryable: false
 };
+
+export * from './fixtures/knowledge';

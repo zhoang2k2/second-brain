@@ -1,5 +1,7 @@
 import { runChecks, getCheckCount } from '../tools/acceptance/registry';
 import '../tools/acceptance/checks/p0';
+import '../tools/acceptance/checks/p1';
+import '../tools/acceptance/checks/s1';
 import { sourceFingerprint } from '../tools/acceptance/evidence';
 import { loadTestProfile } from '../tools/acceptance/profile';
 import { mkdirSync, writeFileSync } from 'node:fs';

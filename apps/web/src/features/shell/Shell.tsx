@@ -7,14 +7,22 @@ import { useShell } from './useShell';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { TerminalIcon } from '@hugeicons/core-free-icons';
 
+import { ViewType } from './view-model';
+
 export interface ShellProps {
   children?: React.ReactNode;
+  activeView?: ViewType;
+  onViewChange?: (view: ViewType) => void;
 }
 
-export const Shell: React.FC<ShellProps> = ({ children }) => {
+export const Shell: React.FC<ShellProps> = ({
+  children,
+  activeView: controlledActiveView,
+  onViewChange,
+}) => {
   const {
     theme,
-    activeView,
+    activeView: internalActiveView,
     groups,
     primaryNav,
     reducedMotion,
@@ -23,7 +31,14 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
     setView,
     toggleGroup,
     toggleMobileOpen,
-  } = useShell();
+  } = useShell(controlledActiveView);
+
+  const activeView = controlledActiveView ?? internalActiveView;
+
+  const handleSelectNav = (view: ViewType) => {
+    setView(view);
+    onViewChange?.(view);
+  };
 
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
 
@@ -46,7 +61,7 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
         activeView={activeView}
         isMobileOpen={isMobileOpen}
         onThemeChange={setTheme}
-        onSelectNav={setView}
+        onSelectNav={handleSelectNav}
         onToggleGroup={toggleGroup}
         onToggleMobile={toggleMobileOpen}
       />

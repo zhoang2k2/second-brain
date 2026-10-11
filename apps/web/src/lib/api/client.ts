@@ -170,18 +170,21 @@ export function createApiClient(config: ApiClientConfig = {}): ApiClient {
     };
 
     const handleNamed = (e: Event) => handleEvent(e as MessageEvent);
+    const namedEvents = [
+      'project.registered', 'vault.registered', 'knowledge.candidate_created',
+      'knowledge.note_updated', 'knowledge.candidate_approved',
+      'knowledge.candidate_rejected', 'knowledge.note_deactivated', 'knowledge.scan_completed',
+    ];
 
     if (typeof eventSource.addEventListener === 'function') {
-      eventSource.addEventListener('project.registered', handleNamed);
-      eventSource.addEventListener('vault.registered', handleNamed);
+      for (const name of namedEvents) eventSource.addEventListener(name, handleNamed);
     }
     eventSource.onmessage = handleEvent;
 
     return () => {
       try {
         if (typeof eventSource.removeEventListener === 'function') {
-          eventSource.removeEventListener('project.registered', handleNamed);
-          eventSource.removeEventListener('vault.registered', handleNamed);
+          for (const name of namedEvents) eventSource.removeEventListener(name, handleNamed);
         }
         eventSource.onmessage = null;
         if (typeof eventSource.close === 'function') {

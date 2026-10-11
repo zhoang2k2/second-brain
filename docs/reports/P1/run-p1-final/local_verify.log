@@ -1,0 +1,261 @@
+
+> second-brain@0.1.0 verify /Users/hoang.nguyen/Personals/second-brain
+> pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:integration && pnpm build
+
+
+> second-brain@0.1.0 lint /Users/hoang.nguyen/Personals/second-brain
+> eslint .
+
+
+/Users/hoang.nguyen/Personals/second-brain/apps/web/app/layout.tsx
+  16:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+✖ 1 problem (0 errors, 1 warning)
+
+
+> second-brain@0.1.0 typecheck /Users/hoang.nguyen/Personals/second-brain
+> tsc -b
+
+
+> second-brain@0.1.0 test:unit /Users/hoang.nguyen/Personals/second-brain
+> vitest run --exclude 'tests/integration/**' --exclude 'tests/e2e/**'
+
+
+ RUN  v2.1.9 /Users/hoang.nguyen/Personals/second-brain
+
+ ✓ apps/runtime/src/modules/knowledge/ingestion.test.ts (9 tests) 105ms
+ ✓ packages/contracts/src/knowledge.test.ts (6 tests) 29ms
+ ✓ apps/runtime/src/modules/projects/service.test.ts (8 tests) 385ms
+ ✓ apps/runtime/src/modules/knowledge/review.test.ts (4 tests) 114ms
+ ✓ apps/runtime/src/modules/knowledge/retrieval.test.ts (5 tests) 43ms
+ ✓ tools/sandbox-probe/engines.test.ts (17 tests) 1014ms
+   ✓ S1-T3 Engine, Authentication, and Network Qualification > inspectEngine > detects available engine binary, reads version, and computes executable sha256 hash 505ms
+   ✓ S1-T3 Engine, Authentication, and Network Qualification > inspectEngine > marks nonInteractiveSupported false when engine lacks non-interactive flags 333ms
+ ✓ apps/runtime/src/modules/knowledge/routes.test.ts (7 tests) 543ms
+   ✓ Knowledge Routes > GET /v1/knowledge returns search results 399ms
+ ✓ tools/sandbox-probe/qualify.test.ts (6 tests) 3ms
+ ✓ tools/sandbox-probe/fixtures.test.ts (9 tests) 68ms
+ ✓ tools/sandbox-probe/engines.integration.test.ts (4 tests) 1813ms
+   ✓ S1-T3 Engine & Network Qualification Integration Tests > Live Host Engine Inspection > inspects installed Codex CLI on host machine 705ms
+   ✓ S1-T3 Engine & Network Qualification Integration Tests > Live Host Engine Inspection > inspects installed Antigravity CLI on host machine with truthful capability assessment 504ms
+   ✓ S1-T3 Engine & Network Qualification Integration Tests > Disposable Network and Credential Boundary Probe > feeds engine probe results into S1-T4 qualification gate and validates capability manifests 370ms
+ ✓ apps/web/src/lib/api/proxy.test.ts (6 tests) 11ms
+ ✓ apps/runtime/src/modules/knowledge/promotion.test.ts (2 tests) 8ms
+ ✓ apps/runtime/src/storage/database.test.ts (2 tests) 17ms
+ ✓ apps/runtime/src/adapters/filesystem/vault-watcher.test.ts (4 tests) 73ms
+ ✓ apps/web/src/features/knowledge/CandidateReview.test.tsx (8 tests) 560ms
+ ✓ apps/runtime/src/server/local-session.test.ts (5 tests) 4ms
+ ✓ apps/web/src/features/shell/Shell.test.tsx (7 tests) 737ms
+ ✓ tools/sandbox-probe/isolation.test.ts (14 tests) 2621ms
+ ✓ apps/web/src/features/settings/RegistrationView.test.tsx (4 tests) 1098ms
+   ✓ RegistrationView Component > failed_registration_is_visible 614ms
+   ✓ RegistrationView Component > successful registration adds item to list 446ms
+ ✓ apps/runtime/src/modules/knowledge/revision-store.test.ts (4 tests) 14ms
+ ✓ packages/contracts/src/foundation.test.ts (8 tests) 7ms
+ ✓ apps/cli/src/commands/status.test.ts (3 tests) 7ms
+ ✓ apps/runtime/src/server/vault-watcher-lifecycle.test.ts (2 tests) 112ms
+ ✓ apps/cli/src/commands/start.test.ts (1 test) 1ms
+ ✓ apps/runtime/src/adapters/filesystem/registered-paths.test.ts (2 tests) 3ms
+ ✓ apps/web/src/features/knowledge/KnowledgeView.test.tsx (12 tests) 1482ms
+   ✓ KnowledgeView Component > search_filters_all_columns 370ms
+ ✓ tools/sandbox-probe/isolation.integration.test.ts (4 tests) 3294ms
+   ✓ S1-T2 Live Filesystem & Process Confinement Integration Tests > runs complete isolation probe and produces all 11 compliant results 2522ms
+   ✓ S1-T2 Live Filesystem & Process Confinement Integration Tests > launchProbe cleanly kills descendant process trees upon AbortSignal cancellation 357ms
+   ✓ S1-T2 Live Filesystem & Process Confinement Integration Tests > launchProbe cleanly terminates process tree on timeout signal 410ms
+
+ Test Files  27 passed (27)
+      Tests  163 passed (163)
+   Start at  11:12:56
+   Duration  8.77s (transform 1.22s, setup 5.45s, collect 18.59s, tests 14.17s, environment 6.69s, prepare 2.64s)
+
+
+> second-brain@0.1.0 test:integration /Users/hoang.nguyen/Personals/second-brain
+> vitest run tests/integration
+
+
+ RUN  v2.1.9 /Users/hoang.nguyen/Personals/second-brain
+
+ ✓ tests/integration/tooling.test.ts (7 tests) 38ms
+ ✓ tests/integration/knowledge-flow.test.ts (10 tests) 283ms
+ ✓ tests/integration/foundation-runtime.test.ts (10 tests) 412ms
+ ✓ tests/integration/sse-transport.test.ts (4 tests) 499ms
+ ✓ tests/integration/cli.test.ts (3 tests) 864ms
+   ✓ Real CLI process and runtime integration with disposable data > runs executable apps/cli/bin/zhon process via execFile 640ms
+ ✓ tests/integration/cli-lifecycle.test.ts (1 test) 2331ms
+   ✓ starts_once_and_registers_across_separate_cli_processes 2330ms
+ ✓ tests/integration/sandbox-probe.test.ts (7 tests) 2296ms
+   ✓ sandbox-probe harness integration tests > runFilesystemProbe > returns structured ProbeResult on disposable fixture 358ms
+   ✓ sandbox-probe harness integration tests > runFilesystemProbe > detects unconfined execution when sandbox is disabled 317ms
+   ✓ sandbox-probe harness integration tests > runProcessCleanupProbe > terminates process tree upon timeout 577ms
+   ✓ sandbox-probe harness integration tests > runProcessCleanupProbe > returns structured ProbeResult without crashing or hanging under default settings 638ms
+ ✓ tests/integration/storage-owner.test.ts (1 test) 1900ms
+   ✓ concurrent_processes_get_exactly_one_database_owner 1900ms
+
+ Test Files  8 passed (8)
+      Tests  43 passed (43)
+   Start at  11:13:06
+   Duration  4.11s (transform 1.10s, setup 3.42s, collect 2.53s, tests 8.62s, environment 1ms, prepare 1.28s)
+
+
+> second-brain@0.1.0 build /Users/hoang.nguyen/Personals/second-brain
+> pnpm -r build
+
+Scope: 4 of 5 workspace projects
+apps/web build$ next build
+apps/web build: ▲ Next.js 16.4.0 (Turbopack)
+apps/web build: ✓ Running next.config.ts took 194ms
+apps/web build:   Creating an optimized production build ...
+apps/web build: ✓ Compiled successfully in 640ms
+apps/web build:   Running TypeScript ...
+apps/web build:   Finished TypeScript in 1168ms ...
+apps/web build:   Collecting page data using 6 workers ...
+apps/web build:   Generating static pages using 6 workers (0/4) ...
+apps/web build:   Generating static pages using 6 workers (1/4) 
+apps/web build:   Generating static pages using 6 workers (2/4) 
+apps/web build:   Generating static pages using 6 workers (3/4) 
+apps/web build: ✓ Generating static pages using 6 workers (4/4) in 328ms
+apps/web build:   Finalizing page optimization ...
+apps/web build: Route (app)
+apps/web build: ┌ ○ /
+apps/web build: ├ ○ /_not-found
+apps/web build: └ ƒ /api/v1/[...path]
+apps/web build: ○  (Static)   prerendered as static content
+apps/web build: ƒ  (Dynamic)  server-rendered on demand
+apps/web build: Done
+Warning: React version was set to "detect" in eslint-plugin-react settings, but the "react" package is not installed. Assuming latest React version for linting.
+Pages directory cannot be found at /Users/hoang.nguyen/Personals/second-brain/pages or /Users/hoang.nguyen/Personals/second-brain/src/pages. If using a custom path, please configure with the `no-html-link-for-pages` rule in your eslint config file.
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+stderr | apps/web/src/features/knowledge/KnowledgeView.test.tsx > KnowledgeView Component > labels_and_colors_are_lime_sky_neutral
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | apps/web/src/features/knowledge/KnowledgeView.test.tsx > KnowledgeView Component > markdown_html_script_and_unsafe_links_not_executed
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to KnowledgeView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+stderr | tests/integration/tooling.test.ts > tooling integration tests > unknown_profile_cannot_pass
+Error: Unknown profile not-configured
+
+stderr | tests/integration/tooling.test.ts > tooling integration tests > tooling_fails_on_no_matching_tests
+Error: Unknown phase "UNKNOWN_PHASE" or zero matching checks found.
+Error: Missing required phase argument. Example: pnpm acceptance -- P0 --profile fixture-local
+
+
+exit_code: 0

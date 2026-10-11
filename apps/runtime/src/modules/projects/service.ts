@@ -281,6 +281,12 @@ export class ProjectService {
 
         // Expected version check:
         const existing = this.repository.findVaultByRoot(this.store.connection, canonicalRoot);
+        if (!existing && this.repository.listVaults(this.store.connection).length > 0) {
+          return {
+            kind: 'conflict',
+            error: { code: 'VAULT_LIMIT', message: 'MVP supports one vault. Keep the registered vault; do not merge sources.', retryable: false },
+          };
+        }
         if (existing) {
           if (command.expectedVersion !== undefined && existing.version !== command.expectedVersion) {
             return {

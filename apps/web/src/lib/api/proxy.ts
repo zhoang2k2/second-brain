@@ -6,6 +6,7 @@ export interface ProxyRequestLike {
   method: string;
   nextUrl?: { searchParams: URLSearchParams };
   headers: { get(name: string): string | null };
+  signal?: AbortSignal;
   text?(): Promise<string>;
 }
 
@@ -59,7 +60,8 @@ export async function proxyToRuntime(request: ProxyRequestLike, pathSegments: st
   }
 
   // Construct target loopback URL strictly targeting the runtime
-  const runtimeUrl = new URL(`/v1/${targetPath}`, RUNTIME_BASE_URL);
+  const normalizedTarget = targetPath.startsWith('v1/') ? targetPath.slice(3) : targetPath;
+  const runtimeUrl = new URL(`/v1/${normalizedTarget}`, RUNTIME_BASE_URL);
   if (request.nextUrl?.searchParams) {
     request.nextUrl.searchParams.forEach((val, key) => {
       runtimeUrl.searchParams.set(key, val);
@@ -100,12 +102,35 @@ export async function proxyToRuntime(request: ProxyRequestLike, pathSegments: st
     const body = request.method !== 'GET' && request.method !== 'HEAD' && typeof request.text === 'function'
       ? await request.text()
       : undefined;
+    const lastEventId = request.headers.get('last-event-id');
+    if (lastEventId) headers['last-event-id'] = lastEventId;
 
     const runtimeRes = await fetch(runtimeUrl.toString(), {
       method: request.method,
       headers,
-      body
+      body,
+      signal: request.signal
     });
+
+    if (targetPath === 'events' && runtimeRes.headers.get('content-type')?.includes('text/event-stream')) {
+      const reader = runtimeRes.body?.getReader();
+      const stream = new ReadableStream<Uint8Array>({
+        async pull(controller) {
+          try {
+            const chunk = await reader?.read();
+            if (!chunk || chunk.done) controller.close();
+            else controller.enqueue(chunk.value);
+          } catch {
+            // A stopped local runtime closes the stream; EventSource reconnects.
+            controller.close();
+          }
+        },
+        async cancel() { try { await reader?.cancel(); } catch {} },
+      });
+      return new NextResponse(stream, { status: runtimeRes.status, headers: {
+        'content-type': 'text/event-stream', 'cache-control': 'no-cache, no-transform',
+      } });
+    }
 
     const data = await runtimeRes.text();
     let response = new NextResponse(data, {
