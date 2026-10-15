@@ -1,0 +1,33 @@
+{
+  "phase": "P1",
+  "run": "run-p1-final",
+  "observedAt": "2026-10-11T04:13:21.166Z",
+  "sourceHash": "428be8906cb32fd2590930bc7d53234cfa7ef7ac64d98a72a6ca748fa7da5196",
+  "baseline": "feature/p1-s1-independent @ 62983df27b92838d3b3fff7e1e7648dbd78fd02a; existing uncommitted workspace preserved",
+  "checks": [
+    {
+      "name": "local_verify",
+      "status": "PASS",
+      "evidencePath": "/Users/hoang.nguyen/Personals/second-brain/docs/reports/P1/run-p1-final/local_verify.log",
+      "evidenceHash": "a7c88cf76a98cc19f3516f1cfcbf0d013d962bbeeea6450fed5928ebf4b298fe"
+    },
+    {
+      "name": "browser_e2e",
+      "status": "PASS",
+      "evidencePath": "/Users/hoang.nguyen/Personals/second-brain/docs/reports/P1/run-p1-final/browser_e2e.log",
+      "evidenceHash": "9ef0e2815e6342c14f1def6965d82bcf4f997d01fe164c673f2a058f9ab58a14"
+    },
+    {
+      "name": "acceptance_p1",
+      "status": "PASS",
+      "evidencePath": "/Users/hoang.nguyen/Personals/second-brain/docs/reports/P1/run-p1-final/acceptance_p1.log",
+      "evidenceHash": "44e432236bc30ab491450eb69450482f48cc450b667a0fb6db75525b684ad344"
+    },
+    {
+      "name": "independent_review",
+      "status": "PASS",
+      "evidencePath": "/Users/hoang.nguyen/Personals/second-brain/docs/reports/P1/run-p1-final/review.json",
+      "evidenceHash": "8722f019d9203fe6a79eedd378496481f599e9f46354c7a459cb71d3fd681fea"
+    }
+  ]
+}

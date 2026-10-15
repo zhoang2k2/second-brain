@@ -33,6 +33,27 @@ export class EventStore {
     return runtimeEvent;
   }
 
+  recordEvent<T>(
+    db: Database.Database,
+    event: { type: string; resourceId?: string; occurredAt?: string; payload?: T; data?: T }
+  ): RuntimeEvent<T> {
+    const payload = (event.data !== undefined ? event.data : event.payload) as T;
+    const resourceId =
+      event.resourceId ??
+      (event.data as { candidate?: { id: string }; vaultId?: string } | undefined)?.candidate?.id ??
+      (event.data as { vaultId?: string } | undefined)?.vaultId ??
+      'system';
+    const occurredAt = event.occurredAt ?? new Date().toISOString();
+    const runtimeEvent = this.appendEvent(db, {
+      type: event.type,
+      resourceId,
+      occurredAt,
+      payload
+    });
+    this.publish(runtimeEvent as RuntimeEvent<unknown>);
+    return runtimeEvent;
+  }
+
   getEvents(db: Database.Database, afterSequence = 0): RuntimeEvent<unknown>[] {
     const stmt = db.prepare(`
       SELECT sequence, type, resource_id, occurred_at, payload

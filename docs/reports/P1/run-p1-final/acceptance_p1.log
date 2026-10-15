@@ -1,0 +1,11 @@
+
+> second-brain@0.1.0 acceptance /Users/hoang.nguyen/Personals/second-brain
+> tsx scripts/acceptance.ts -- P1 --profile fixture-local --run run-p1-final
+
+Running acceptance checks for phase P1 with profile fixture-local (2 checks registered)...
+Acceptance records:
+  - [PASS] knowledge_contracts_and_schema_check
+  - [PASS] knowledge_storage_and_fts_check
+Acceptance completed successfully: all 2 checks PASS.
+
+exit_code: 0

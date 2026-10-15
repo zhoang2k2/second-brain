@@ -12,7 +12,9 @@
     "verify": "pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:integration && pnpm build",
     "acceptance": "tsx scripts/acceptance.ts",
     "report": "tsx scripts/report.ts",
-    "validate:p0": "tsx scripts/validate-p0.ts"
+    "validate:p0": "tsx scripts/validate-p0.ts",
+    "validate:p1": "tsx scripts/validate-p1.ts",
+    "validate:s1": "tsx scripts/validate-s1.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",

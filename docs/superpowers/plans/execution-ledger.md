@@ -1,6 +1,6 @@
 # Zhon Execution Ledger
 
-Updated: 2026-10-10, Asia/Ho_Chi_Minh.
+Updated: 2026-10-11, Asia/Ho_Chi_Minh.
 Plan: `docs/superpowers/plans/2026-10-10-p0-foundation.md`
 
 ## Agents & Subagent Configuration
@@ -76,3 +76,67 @@ BOSS authorized finishing P0 after review disproved the earlier certification. T
 - Reports: Generated `agent.md` and `user.vi.md` in `docs/reports/P0/run-p0-remediation-final/`.
 - Ready for P1 and S1 progression.
 
+---
+
+## Phase P1: Knowledge Ingestion, Search and Review Status
+
+| Task ID | Description | Owner | Subagent | Model Tier | Owned Files | State | Blockers |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **P1-T1** | Knowledge contracts & persistence schema | Integrator | Controller | Flash High | `packages/contracts/src/knowledge.ts`, `002_knowledge.sql`, `fixtures/knowledge.ts` | **Complete** | None |
+| **P1-T2** | Stable ingestion & immutable revision store | BE Ingestion | `zhon-coder-backend` (`62614053`) | Flash High | `apps/runtime/src/modules/knowledge/{ingestion,repository,revision-store}.ts`, `adapters/filesystem/vault-watcher.ts` | **Complete** | None |
+| **P1-T3** | Exact review, scoped search & crash-safe promotion | BE Review | `zhon-coder-backend` (`62614053`) | Flash High | `apps/runtime/src/modules/knowledge/{review,retrieval,promotion,routes}.ts` | **Complete** | None |
+| **P1-T4** | Three-column knowledge review UI | FE | `zhon-coder-frontend` (`8051ca6c`) | Flash High | `apps/web/src/features/knowledge/**` | **Complete** | None |
+| **P1-T5** | Real vault-to-review flow, integration & reports | Integrator | Controller | Flash High | `tests/integration/knowledge-flow.test.ts`, `tests/e2e/knowledge-review.spec.ts`, `tools/acceptance/checks/p1.ts`, `docs/reports/P1/run-p1-final/**` | **Complete** | None |
+
+### Historical Phase P1 Certification — superseded by independent audit
+- **Status:** **DoneLocal (Certified)**
+- **Run ID:** `run-p1-final`
+- **Source Hash:** `428be8906cb32fd2590930bc7d53234cfa7ef7ac64d98a72a6ca748fa7da5196`
+- **Auditor / Reviewer:** `zhon-reviewer` (`817ea796-7d07-4ddb-8611-02a1b7fdcf2a`)
+- **Verification Gates:**
+  - `local_verify`: PASS (lint, typecheck, 163 unit tests, 43 integration tests, build)
+  - `browser_e2e`: PASS (7/7 Playwright tests passing, candidate review and persistence across restart)
+  - `acceptance_p1`: PASS (2/2 acceptance checks passing)
+  - `independent_review`: PASS (`zhon-reviewer` review recorded in `docs/reports/P1/run-p1-final/review.json` matching `428be8906cb32fd2590930bc7d53234cfa7ef7ac64d98a72a6ca748fa7da5196`)
+- **Reports:** `docs/reports/P1/run-p1-final/agent.md`, `docs/reports/P1/run-p1-final/user.vi.md`
+
+---
+
+## Phase S1: Sandbox & CLI Feasibility Status
+
+| Task ID | Description | Owner | Subagent | Model Tier | Owned Files | State | Blockers |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **S1-T1** | Probe policy & synthetic disposable fixtures | Integrator | Controller | Flash High | `tools/sandbox-probe/{types,fixtures}.ts`, `packages/contracts/src/sandbox.ts` | **Complete** | None |
+| **S1-T2** | Filesystem & process isolation probe harness | BE Feasibility | `zhon-coder-backend` (`5320f09d`) | Flash High | `tools/sandbox-probe/isolation*.ts` | **Complete** | None |
+| **S1-T3** | Real engine, auth & network qualification | BE Feasibility | `zhon-coder-backend` (`9ca6726a`) | Flash High | `tools/sandbox-probe/engines*.ts`, `docs/qualification/sandbox/engine-matrix.md` | **Complete** | None |
+| **S1-T4** | Capability qualification & Go/No-Go decision | Integrator | Controller | Flash High | `tools/sandbox-probe/qualify*.ts`, `tools/acceptance/checks/s1.ts`, `docs/qualification/sandbox/decision.md`, `docs/reports/S1/run-s1-final/**` | **Complete** | None |
+
+### Phase S1 Certification
+- **Status:** **DoneLocal (Certified)**
+- **Run ID:** `run-s1-final`
+- **Source Hash:** `ee83f2f371fd52f26d686c281619efee4ee2d672998ea70f3ffff1610d49efde`
+- **Verification Gates:**
+  - `local_verify`: PASS (lint, typecheck, 152/152 unit, 39/39 integration, build)
+  - `acceptance_s1`: PASS (2/2 acceptance checks passing)
+  - `qualification_artifacts`: PASS (`docs/qualification/sandbox/engine-matrix.md`, `docs/qualification/sandbox/decision.md`)
+  - `independent_review`: PASS (`zhon-reviewer` review recorded in `docs/reports/S1/run-s1-final/review.json`)
+- **Reports:** `docs/reports/S1/run-s1-final/agent.md`, `docs/reports/S1/run-s1-final/user.vi.md`
+- **Go/No-Go Decision:** Unconfined AUTO execution is **blocked** for Phase P4. Codex CLI conditionally qualified with loopback proxy; Antigravity CLI unsupported for autonomous execution. Human-in-the-loop approval or pre-approved budgets required.
+
+## P1 completion resumed — 2026-10-11
+
+- BOSS authorized continuing the interrupted P1 completion; existing dirty source and S1 files preserved, no commit/push.
+- Previous P1 certification is historical and superseded by the 2026-10-11 audits and this remediation run.
+- Scope: P1-T1–T5 acceptance gaps, source lifecycle, exact revision integrity, review UI and truthful source-bound reporting.
+- Ruling: retain the approved MVP single vault; registration rejects a distinct second vault and startup rejects ambiguous legacy multi-vault databases. No silently merged sources or data deletion.
+- Ruling: manual P1 approval does not write authored Markdown; immutable snapshot publication precedes one synchronous SQLite transaction for journal/pointer/index/event/receipt. P3 write-back semantics remain outside this phase.
+- Ruling: frontmatter supports unique flat scalar properties only; unsupported nested structures/malformed scalars fail closed, quoted strings and inline comments normalize identity.
+- RED evidence this session: 12 initial behavioral regressions failed, then 4 additional scalar regressions and corrupted-journal completion failed. All required fixes remain gated by final verification/review.
+- Remediated: startup/registration scanning; source CAS and query availability; single-vault identity; duplicate ID rechecks (including oversize body/header); snapshot integrity on approve/rollback/recovery; superseded Candidate history; approved content/path search; safe watcher diagnostic and browser refresh.
+- Verified actual transaction abort after pointer mutation preserves old Active, pending Candidate, authored source, audit event count and absent failed receipt.
+- Final state: **DoneLocal — independently reviewed**. P1-T1–T5 are complete for the bounded MVP; old certifications/audits remain historical.
+- Run: `run-p1-completion-20261011-resumed`; source SHA-256: `e93e86785251418cd798d1e8d39a4460ef4497321576ed3cca8e36ee184123d5`.
+- Exact-source final gates: `pnpm verify` PASS (167 unit, 84 integration, lint/typecheck/build); browser E2E 7/7 PASS; P1 acceptance 3/3 PASS; independent source review PASS (`/root/p1_review`, 107 focused and 43 exact-final readiness/promotion tests).
+- Final report command: `pnpm report -- P1 --run run-p1-completion-20261011-resumed` → `DoneLocal`; evidence logs/checks/review and English/Vietnamese reports persist in that directory.
+- Limits: one vault, supported flat scalar frontmatter only, native watcher qualified locally; existing lint/tooling/React act warnings remain non-blocking. SQLite + immutable snapshots must be preserved for P7 backup/recovery.
+- P2 receives scoped exact-approved retrieval; P3 receives Candidate review. No P2/P3/S1 implementation performed in this completion turn; no commit/push or remote CI certification.

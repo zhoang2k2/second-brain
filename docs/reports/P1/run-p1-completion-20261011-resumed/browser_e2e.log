@@ -1,0 +1,24 @@
+
+> second-brain@0.1.0 test:e2e /Users/hoang.nguyen/Personals/second-brain
+> playwright test
+
+
+Running 7 tests using 1 worker
+
+  ✓  1 tests/e2e/foundation.spec.ts:122:7 › P0 Production Shell & Browser E2E Specification › browser_registration_survives_runtime_restart_and_page_reload (1.2s)
+  ✓  2 tests/e2e/foundation.spec.ts:177:7 › P0 Production Shell & Browser E2E Specification › browser_keyboard_navigation_and_theme_persistence (526ms)
+  ✓  3 tests/e2e/foundation.spec.ts:202:7 › P0 Production Shell & Browser E2E Specification › browser_responsive_navigation_and_reduced_motion (450ms)
+  ✓  4 tests/e2e/foundation.spec.ts:219:7 › P0 Production Shell & Browser E2E Specification › browser_runtime_offline_visible_in_ui (486ms)
+  ✓  5 tests/e2e/foundation.spec.ts:239:7 › P0 Production Shell & Browser E2E Specification › arbitrary_proxy_url_denied (2ms)
+  ✓  6 tests/e2e/foundation.spec.ts:253:7 › P0 Production Shell & Browser E2E Specification › frozen_lockfile_ci (5ms)
+  ✓  7 tests/e2e/knowledge-review.spec.ts:126:7 › Phase P1 Knowledge Review Browser E2E Specification › browser_candidate_review_approve_and_persist_across_restart (2.0s)
+
+  7 passed (6.5s)
+[WebServer] (node:11323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:11359) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:11421) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+exit_code: 0

@@ -26,6 +26,23 @@ function createMockRequest(params: {
 }
 
 describe('proxyToRuntime security', () => {
+  it('forwards SSE bytes before the upstream stream closes', async () => {
+    const originalFetch = globalThis.fetch;
+    const upstream = new ReadableStream<Uint8Array>({ start(controller) {
+      controller.enqueue(new TextEncoder().encode('event: knowledge.candidate_created\ndata: {"sequence":1}\n\n'));
+    } });
+    globalThis.fetch = async () => new Response(upstream, { headers: { 'content-type': 'text/event-stream' } });
+    try {
+      const response = await Promise.race([
+        proxyToRuntime(createMockRequest({ url: 'http://127.0.0.1:3000/api/v1/events' }), ['events']),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('SSE was buffered')), 100)),
+      ]);
+      expect(response.headers.get('content-type')).toContain('text/event-stream');
+      const reader = response.body!.getReader();
+      expect(new TextDecoder().decode((await reader.read()).value)).toContain('knowledge.candidate_created');
+      await reader.cancel();
+    } finally { globalThis.fetch = originalFetch; }
+  });
   it('rejects_arbitrary_proxy_target', async () => {
     const req1 = createMockRequest({ url: 'http://127.0.0.1:3000/api/v1/https://evil.com/leak' });
     const res1 = await proxyToRuntime(req1, ['https://evil.com', 'leak']);

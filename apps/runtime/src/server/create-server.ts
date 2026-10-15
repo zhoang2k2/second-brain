@@ -1,3 +1,5 @@
+import * as path from 'node:path';
+import * as os from 'node:os';
 import fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Instant, Health } from '@zhon/contracts';
 import { Store } from '../storage/database';
@@ -6,6 +8,14 @@ import { LocalSessionConfig, LocalSessionManager } from './local-session';
 import { EventStore } from './events';
 import { ProjectService } from '../modules/projects/service';
 import { projectRoutes } from '../modules/projects/routes';
+import { RevisionStore } from '../modules/knowledge/revision-store';
+import { KnowledgeRepository } from '../modules/knowledge/repository';
+import { KnowledgeReviewService } from '../modules/knowledge/review';
+import { KnowledgeRetrievalService } from '../modules/knowledge/retrieval';
+import { KnowledgeIngestionService } from '../modules/knowledge/ingestion';
+import { reconcilePromotions } from '../modules/knowledge/promotion';
+import { VaultWatcher } from '../adapters/filesystem/vault-watcher';
+import { knowledgeRoutes } from '../modules/knowledge/routes';
 
 export interface ServerDeps {
   store: Store;
@@ -14,9 +24,16 @@ export interface ServerDeps {
   localSessionConfig: LocalSessionConfig;
   sessionManager?: LocalSessionManager;
   eventStore?: EventStore;
+  revisionsDir?: string;
+  knowledgeRepo?: KnowledgeRepository;
+  reviewService?: KnowledgeReviewService;
+  retrievalService?: KnowledgeRetrievalService;
+  ingestionService?: KnowledgeIngestionService;
 }
 
 export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
+  const registeredVaults = deps.store.connection.prepare('SELECT id, root FROM vaults').all() as Array<{ id: string; root: string }>;
+  if (registeredVaults.length > 1) throw new Error('MVP cannot start with multiple vaults; preserve data and explicitly select one vault before proceeding.');
   const app = fastify({
     bodyLimit: 1048576, // Cap request bodies at 1 MiB
     logger: false
@@ -65,8 +82,17 @@ export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
       }
     }
 
-    // 3. Mutation session validation for /v1/commands/*
-    const isMutation = request.method === 'POST' && (request.url.startsWith('/v1/commands') || request.url.startsWith('/v1/register'));
+    // 3. Mutation session validation for /v1/commands/* and mutation endpoints
+    const isMutation =
+      request.method === 'POST' &&
+      (request.url.startsWith('/v1/commands') ||
+        request.url.startsWith('/v1/register') ||
+        request.url.startsWith('/v1/approve') ||
+        request.url.startsWith('/v1/reject') ||
+        request.url.startsWith('/v1/deactivate') ||
+        request.url.startsWith('/v1/rollback') ||
+        request.url.startsWith('/v1/share') ||
+        request.url.startsWith('/v1/capture') || request.url.startsWith('/v1/rescan'));
     if (isMutation) {
       const sessionId = (request.headers['x-session-id'] as string) ||
                         (request.headers.authorization?.startsWith('Bearer ') ? request.headers.authorization.slice(7) : undefined);
@@ -135,6 +161,9 @@ export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
     }
   );
 
+  // Active SSE replies tracked for clean server shutdown
+  const activeSseReplies = new Set<FastifyReply>();
+
   // GET /v1/events (SSE streaming)
   app.get(
     '/v1/events',
@@ -143,6 +172,7 @@ export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
       reply: FastifyReply
     ) => {
       reply.hijack();
+      activeSseReplies.add(reply);
 
       const query = request.query;
       const lastEventId = request.headers['last-event-id'];
@@ -184,6 +214,7 @@ export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
       });
 
       const cleanup = () => {
+        activeSseReplies.delete(reply);
         unsubscribe();
       };
 
@@ -194,6 +225,170 @@ export async function createServer(deps: ServerDeps): Promise<FastifyInstance> {
 
   // Register projects routes
   await app.register(projectRoutes, { service: projectService });
+
+  // Knowledge services and routes
+  const knowledgeRepo = deps.knowledgeRepo ?? new KnowledgeRepository();
+
+  const revisionsDir =
+    deps.revisionsDir ??
+    (deps.store.connection.name && deps.store.connection.name !== ':memory:'
+      ? path.join(path.dirname(deps.store.connection.name), 'revisions')
+      : path.join(os.tmpdir(), 'zhon-revisions'));
+  const revisionStore = new RevisionStore({ revisionsDir });
+  await reconcilePromotions(deps.store, knowledgeRepo, deps.clock, revisionStore);
+  const reviewService =
+    deps.reviewService ??
+    new KnowledgeReviewService({
+      store: deps.store,
+      repo: knowledgeRepo,
+      revisionStore,
+      clock: deps.clock,
+      eventStore
+    });
+  const retrievalService =
+    deps.retrievalService ??
+    new KnowledgeRetrievalService({
+      store: deps.store,
+      repo: knowledgeRepo,
+      clock: deps.clock
+    });
+  const ingestionService =
+    deps.ingestionService ??
+    new KnowledgeIngestionService({
+      store: deps.store,
+      repo: knowledgeRepo,
+      revisionStore,
+      policy: deps.registeredRootPolicy,
+      clock: deps.clock
+    });
+
+  await app.register(knowledgeRoutes, { reviewService, retrievalService, ingestionService });
+
+  // Background filesystem watchers for registered vaults
+  const watchers = new Map<string, VaultWatcher>();
+  const backgroundJobs = new Set<Promise<unknown>>();
+  let closing = false;
+  const trackJob = <T>(job: Promise<T>): Promise<T> => {
+    backgroundJobs.add(job);
+    void job.finally(() => backgroundJobs.delete(job)).catch(() => {});
+    return job;
+  };
+
+  const startWatcherForVault = (vaultRoot: string, vaultId: string): VaultWatcher | undefined => {
+    if (watchers.has(vaultId)) {
+      return watchers.get(vaultId);
+    }
+    try {
+      const watcher = new VaultWatcher({
+        vaultRoot,
+        debounceMs: 150,
+        onChange: async (relPath) => {
+          if (closing) return;
+          try {
+            const captureRes = await trackJob(ingestionService.captureNote({
+              vaultId,
+              path: relPath
+            }));
+            if (closing) return;
+            if (!captureRes.ok) {
+              eventStore.recordEvent(deps.store.connection, {
+                type: 'knowledge.note_updated', resourceId: vaultId, occurredAt: deps.clock(),
+                payload: { vaultId, path: relPath, issue: { code: captureRes.error.code, retryable: captureRes.error.retryable } },
+              });
+              return;
+            }
+            if (captureRes.ok && captureRes.value.candidate.state === 'pending') {
+              const candidate = captureRes.value.candidate;
+              eventStore.recordEvent(deps.store.connection, {
+                type: 'knowledge.candidate_created',
+                resourceId: candidate.id,
+                occurredAt: deps.clock(),
+                data: {
+                  vaultId,
+                  path: relPath,
+                  candidate
+                },
+                payload: {
+                  vaultId,
+                  path: relPath,
+                  candidate
+                }
+              });
+            }
+          } catch {
+            // Ignore background watcher processing errors
+          }
+        }
+      });
+      watcher.start();
+      watchers.set(vaultId, watcher);
+      return watcher;
+    } catch {
+      return undefined;
+    }
+  };
+
+  interface ServerWithWatchers {
+    attachVaultWatcher: (vaultId: string, vaultRoot: string) => VaultWatcher | undefined;
+    getVaultWatchers: () => Map<string, VaultWatcher>;
+    ingestionService: KnowledgeIngestionService;
+  }
+  const appExt = app as unknown as ServerWithWatchers;
+  appExt.attachVaultWatcher = (vaultId: string, vaultRoot: string) => startWatcherForVault(vaultRoot, vaultId);
+  appExt.getVaultWatchers = () => watchers;
+  appExt.ingestionService = ingestionService;
+
+  // On server startup: query all registered vaults from database
+  try {
+    const vaults = deps.store.connection
+      .prepare('SELECT id, root FROM vaults')
+      .all() as Array<{ id: string; root: string }>;
+    for (const v of vaults) {
+      startWatcherForVault(v.root, v.id);
+      await ingestionService.rescanVault(v.id);
+    }
+  } catch {
+    // Ignore error listing vaults
+  }
+
+  // Auto-attach when vault is registered via eventStore
+  const unsubscribeVaultRegistration = eventStore.subscribe((evt) => {
+    if (evt.type === 'vault.registered' && evt.payload && typeof evt.payload === 'object') {
+      const v = evt.payload as { root: string; id: string };
+      if (v.root && v.id) {
+        startWatcherForVault(v.root, v.id);
+        void trackJob(ingestionService.rescanVault(v.id)).then(result => {
+          if (!closing) eventStore.recordEvent(deps.store.connection, {
+            type: 'knowledge.scan_completed', resourceId: v.id, occurredAt: deps.clock(), payload: result,
+          });
+        }).catch(() => {});
+      }
+    }
+  });
+
+  // On server close: close all active vault watchers and SSE streams
+  app.addHook('onClose', async () => {
+    closing = true;
+    unsubscribeVaultRegistration();
+    for (const watcher of watchers.values()) watcher.close();
+    await Promise.allSettled([...backgroundJobs]);
+    for (const sseReply of activeSseReplies) {
+      try {
+        if (!sseReply.raw.destroyed && !sseReply.raw.writableEnded) {
+          sseReply.raw.end();
+          sseReply.raw.destroy();
+        }
+      } catch {
+        // Ignore socket destroy errors
+      }
+    }
+    activeSseReplies.clear();
+
+    for (const w of watchers.values()) {
+      w.close();
+    }
+    watchers.clear();
+  });
 
   return app;
 }

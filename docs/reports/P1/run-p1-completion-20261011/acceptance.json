@@ -1,0 +1,21 @@
+{
+  "phase": "P1",
+  "run": "run-p1-completion-20261011",
+  "profile": "fixture-local",
+  "observedAt": "2026-10-11T04:34:43.042Z",
+  "sourceHash": "fbaca01c4cfd461fa4196baf4cccb7d15231f0d3cd5e97941e01cd5bc11c2132",
+  "records": [
+    {
+      "name": "real_runtime_knowledge_lifecycle",
+      "status": "PASS"
+    },
+    {
+      "name": "knowledge_contracts_and_schema_check",
+      "status": "PASS"
+    },
+    {
+      "name": "knowledge_storage_and_fts_check",
+      "status": "PASS"
+    }
+  ]
+}
