@@ -1,44 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Second Brain
 
-## Getting Started
+A local-first personal AI workspace. The repository is currently at **M1 — Foundation**; chat, CLI, conversation history, lesson generation, and knowledge retrieval are not implemented yet.
 
-First, run the development server:
+## Requirements
+
+- Node.js `>=20.9.0`
+- pnpm `10.24.0`
+- macOS is the current development environment; no GPU or model download is required for M1.
+
+## Install and run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install --frozen-lockfile
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local model configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.example` documents `OLLAMA_BASE_URL`, with `http://localhost:11434` as the local Ollama endpoint. Copy it to `.env.local` when preparing for a future Ollama integration:
 
-## Learn More
+```bash
+cp .env.example .env.local
+```
 
-To learn more about Next.js, take a look at the following resources:
+M1 does not read this variable or connect to Ollama. A health/connectivity endpoint is deferred until it can be tested against a real local runtime. The application will not send requests to a cloud provider.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Quality checks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm build
+```
 
-## Deploy on Vercel
+M1 contains no domain behavior and does not add a test framework. Use a focused test for the first independently testable logic in a later milestone, and add end-to-end coverage when the chat and knowledge flows exist. The current boot check is to run `pnpm dev` and confirm the landing page loads.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Knowledge vault
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
-# second-brain
+`knowledge/` is reserved for Markdown notes and can be opened as an Obsidian vault. Markdown will remain the durable source of truth. M1 adds no sample lessons, frontmatter schema, local database, or generated index.
+
+## Current scope and next milestones
+
+- **M1 — Foundation:** minimal Next.js shell, local configuration example, knowledge placeholder, and quality commands.
+- **M2 — Chat:** Web and CLI chat, local Ollama integration, streaming, and conversation history.
+- **M3 — Knowledge:** reviewed lesson creation and basic Markdown search.
+- **M4 — Integration:** explicit provider choice and the end-to-end MVP scenario.
+
+Only M1 is in the active implementation scope. Later milestones require their own owner-approved entry criteria. See [`doc/plans/phase-1-mvp.md`](doc/plans/phase-1-mvp.md).
