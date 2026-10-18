@@ -1,7 +1,9 @@
 # Status
 
-- Current completed milestone: M1 — Foundation.
-- M1 branch: `feature/m1`, based on the approved `develop` commit (`1ba468b`).
+- Current completed milestone: M1 — Foundation (`07e2407`).
+- M1 branch: `feature/m1`, based on approved `develop` commit `1ba468b`.
 - M1 acceptance: source checks, production build, and local boot check pass on 2026-10-19.
-- Next milestone: M2 — Chat; blocked on owner decisions listed in `BLOCKERS.md`.
+- M2/M3/M4 feature branches exist from the latest valid M1 product commit; none has product implementation after M1.
+- M2/M3/M4 are blocked on owner decisions and dependencies in `BLOCKERS.md`.
+- Execution state: `BLOCKED`; remaining product tasks require owner decisions or unavailable local runtime setup.
 - No push, deploy, or merge has been performed.

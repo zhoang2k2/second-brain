@@ -7,6 +7,7 @@
 - History retention and resume/delete behavior are undecided.
 - M2 scope and acceptance criteria have not been explicitly approved.
 - Real Ollama acceptance also requires BOSS to install/start Ollama and make the selected model available locally. No model was downloaded or tested.
+- Environment probe on 2026-10-19: Ollama CLI not found; `http://127.0.0.1:11434/api/tags` returned curl exit 7 / HTTP 000.
 
 ## M3 — Knowledge
 
