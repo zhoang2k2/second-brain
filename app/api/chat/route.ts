@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCitedSources } from "@/lib/citations";
 import { searchKnowledge } from "@/lib/knowledge";
 import { getOllamaBaseUrl, streamOllamaChat } from "@/lib/ollama";
 import { store } from "@/lib/store";
@@ -51,6 +52,19 @@ export const POST = async (request: Request) => {
     );
   }
 
+  let knowledge;
+  try {
+    knowledge = await searchKnowledge(message);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error ? error.message : "Knowledge search failed.",
+      },
+      { status: 500 },
+    );
+  }
+
   await store.addMessage(conversation.id, "user", message);
   const assistant = await store.addMessage(
     conversation.id,
@@ -58,7 +72,6 @@ export const POST = async (request: Request) => {
     "",
     "streaming",
   );
-  const knowledge = await searchKnowledge(message);
   const history = conversation.messages.filter(
     (item) => item.status === "complete",
   );
@@ -82,7 +95,7 @@ export const POST = async (request: Request) => {
             content += chunk;
             controller.enqueue(encodeEvent({ type: "delta", content: chunk }));
           }
-          const sources = knowledge.map((item) => item.path);
+          const sources = getCitedSources(content, knowledge);
           await store.updateMessage(
             conversation.id,
             assistant.id,

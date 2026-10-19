@@ -1,5 +1,9 @@
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  appendLessonUpdate,
   createAdditiveLessonMarkdown,
   createLessonMarkdown,
   createSlug,
@@ -48,6 +52,25 @@ describe("knowledge helpers", () => {
     expect(updated).toContain("Existing note");
     expect(updated).toContain("New information");
     expect(updated).toContain('updated: "2026-10-20T00:00:00.000Z"');
+  });
+
+  it("appends a reviewed update without replacing concurrent note content", async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), "second-brain-"));
+    const filePath = path.join(directory, "lesson.md");
+    await writeFile(filePath, "---\ntitle: Lesson\n---\n\nOriginal", "utf8");
+
+    try {
+      await Promise.all([
+        appendLessonUpdate(filePath, "Update one"),
+        appendLessonUpdate(filePath, "Update two"),
+      ]);
+      const result = await readFile(filePath, "utf8");
+      expect(result).toContain("Original");
+      expect(result).toContain("Update one");
+      expect(result).toContain("Update two");
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 
   it("does not return notes that match only common question words", () => {

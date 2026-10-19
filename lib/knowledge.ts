@@ -1,5 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
+import {
+  appendFile,
+  mkdir,
+  readFile,
+  readdir,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 
 export type LessonInput = {
@@ -191,18 +197,23 @@ export const appendToLesson = async (
   const files = await listMarkdownFiles(KNOWLEDGE_DIRECTORY);
   const collision = findLessonCollision(slug, files);
   if (!collision) throw new Error("LESSON_NOT_FOUND");
-  const existingMarkdown = await readFile(collision, "utf8");
-  const updatedMarkdown = createAdditiveLessonMarkdown(
-    existingMarkdown,
-    content,
-  );
-  const temporaryPath = `${collision}.${randomUUID()}.tmp`;
-  await writeFile(temporaryPath, updatedMarkdown, {
-    encoding: "utf8",
-    mode: 0o600,
-  });
-  await rename(temporaryPath, collision);
+  await appendLessonUpdate(collision, content);
   return { path: path.relative(process.cwd(), collision) };
+};
+
+export const appendLessonUpdate = async (
+  filePath: string,
+  content: string,
+): Promise<void> => {
+  const existingMarkdown = await readFile(filePath, "utf8");
+  const addition = content.trim();
+  if (!addition) throw new Error("Lesson content is required.");
+  const body = existingMarkdown.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
+  if (body.includes(addition)) throw new Error("LESSON_DUPLICATE_CONTENT");
+  const updatedAt = new Date().toISOString();
+  await appendFile(filePath, `\n\n## Update (${updatedAt})\n\n${addition}\n`, {
+    encoding: "utf8",
+  });
 };
 
 export const getLessonBySlug = async (
