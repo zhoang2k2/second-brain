@@ -1,5 +1,7 @@
 # Blockers
 
+Fillable owner handoff: `.agent-runs/MVP-OWNER-CHECKLIST.md`. Treat the entries below as the historical pending decisions; resolve each when BOSS supplies a choice or explicitly delegates it. Autonomous implementation authorization is already present in the session, so do not require renewed approval of ordinary implementation steps. Real note data and cloud credentials are not mandatory when synthetic test fixtures and local-only MVP are selected.
+
 ## M2 — Chat
 
 - Owner model choice and expected resource/performance profile are not recorded.

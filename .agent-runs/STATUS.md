@@ -6,4 +6,5 @@
 - M2/M3/M4 feature branches exist from the latest valid M1 product commit; none has product implementation after M1.
 - M2/M3/M4 are blocked on owner decisions and dependencies in `BLOCKERS.md`.
 - Execution state: `BLOCKED`; remaining product tasks require owner decisions or unavailable local runtime setup.
+- Owner input collection: `.agent-runs/MVP-OWNER-CHECKLIST.md` contains the fillable MVP setup, data policy, provider, and acceptance checklist. Implementation authorization already exists; routine technical choices may be delegated in that file.
 - No push, deploy, or merge has been performed.
