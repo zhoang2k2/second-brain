@@ -1,9 +1,7 @@
 # Handoff
 
-M1 is validated at `07e2407` on `feature/m1`. M2, M3, and M4 feature branches were created in dependency order from the latest valid product commit. No M2+ product implementation is present.
+M1 is validated at `07e2407` on `feature/m1`. On 2026-10-20, BOSS resolved OWNER-02–OWNER-07 for the local MVP: use `qwen3.5:latest`, keep history local with the approved lifecycle, use unique knowledge keys/slugs without duplicates or overwrite, require explicit review before writes, exclude cloud until a future phase, and use the approved end-to-end checklist with manual Obsidian verification by BOSS.
 
-`blocked/m2`, `blocked/m3`, and `blocked/m4` have isolated worktrees and dated audits under `.agent-runs/reports/`. M2 needs an approved local model/resource profile, history storage, retention/resume/delete behavior, and scope/acceptance criteria. Ollama is unavailable locally; do not download model weights. M3 also needs Lesson 08 schema and privacy/review decisions. M4 depends on M2/M3 and needs provider and end-to-end acceptance decisions.
+Ollama `0.40.6` is reachable at `http://127.0.0.1:11434`; the local model responds to a synthetic prompt. The one observed response took about 38 seconds; no latency target is set. The listed `glm-5.3-flash:cloud` model is out of scope and must never be called or used as fallback.
 
-Phase 2–4 remain gated by the owner decisions in their plans and by Phase 1 completion. No independent product task remains until the gates are resolved.
-
-For the next owner handoff, use `.agent-runs/MVP-OWNER-CHECKLIST.md` as the single input form. It distinguishes actual manual setup from delegable implementation choices and later Obsidian acceptance. Reconcile the old M1-only authorization text with the user's existing autonomous-execution instructions; do not ask for renewed implementation permission after the required choices are supplied. Owner-authored notes are not a prerequisite for synthetic test fixtures. Cloud credentials are unnecessary if the owner selects local-only MVP.
+M2 → M3 → M4 implementation is authorized on the existing `feature/m2` worktree. Use the updated checklist and phase plan as the source of truth. Keep owner knowledge private; use synthetic fixtures only. No push, deploy, or merge to protected branches. BOSS still performs the final Obsidian open/read/edit acceptance after an exact vault/file path is provided.

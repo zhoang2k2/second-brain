@@ -2,25 +2,13 @@
 
 Fillable owner handoff: `.agent-runs/MVP-OWNER-CHECKLIST.md`. Treat the entries below as the historical pending decisions; resolve each when BOSS supplies a choice or explicitly delegates it. Autonomous implementation authorization is already present in the session, so do not require renewed approval of ordinary implementation steps. Real note data and cloud credentials are not mandatory when synthetic test fixtures and local-only MVP are selected.
 
-## M2 — Chat
+## MVP — M2 to M4
 
-- Owner model choice and expected resource/performance profile are not recorded.
-- Conversation-history storage is undecided; SQLite remains only a candidate.
-- History retention and resume/delete behavior are undecided.
-- M2 scope and acceptance criteria have not been explicitly approved.
-- Real Ollama acceptance also requires BOSS to install/start Ollama and make the selected model available locally. No model was downloaded or tested.
-- Environment probe on 2026-10-19: Ollama CLI not found; `http://127.0.0.1:11434/api/tags` returned curl exit 7 / HTTP 000.
-
-## M3 — Knowledge
-
-- Depends on M2 chat/history contracts.
-- Lesson 08 decisions for metadata, naming, organization, and links are not recorded as an approved schema.
-- Conversation content eligibility, sensitive-data handling, and review-before-save policy need owner approval.
-
-## M4 — Integration
-
-- Depends on M2 and M3.
-- Cloud provider inclusion, provider selection, cost/privacy controls, and final end-to-end acceptance scenario are undecided.
+- Owner gates OWNER-02 to OWNER-07 were resolved on 2026-10-20. See the checked decisions in `.agent-runs/MVP-OWNER-CHECKLIST.md`.
+- Model/runtime verified: Ollama `0.40.6`, local model `qwen3.5:latest` (7.6 GB), endpoint `/api/tags` reachable, and one synthetic inference prompt succeeded. Measured response was about 38 seconds for that prompt; this is an observation, not a latency target.
+- MVP is local-only. Do not call `glm-5.3-flash:cloud`, add a cloud adapter, or fall back to cloud.
+- Knowledge writes must use unique keyword/slug identity, reject duplicates, never overwrite, and offer a reviewed additive proposal when new information differs from existing knowledge.
+- No known owner-decision blocker remains for M2-M4. Implementation and runtime acceptance are still pending; report newly found technical/environmental blockers with evidence.
 
 ## Later roadmap phases
 

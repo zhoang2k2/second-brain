@@ -10,18 +10,18 @@
 
 ## Current authorization
 
-The active assignment is **M1 Foundation only**. M2–M4 are documented for later execution; this plan does not approve their implementation. BOSS approves the full scope and acceptance criteria for each milestone before it begins.
+M1 Foundation is complete. On 2026-10-20 BOSS approved the M2–M4 local MVP scope and end-to-end acceptance checklist. Continue in dependency order on the existing `feature/m2` worktree. Use local Ollama model `qwen3.5:latest`; synthetic, non-sensitive prompts are approved for implementation acceptance. There is no latency SLA; measure and report observed performance. Cloud is excluded until a future phase. Local commits are allowed; do not push, deploy, or merge protected branches. See `.agent-runs/MVP-OWNER-CHECKLIST.md` for the approved data, history, knowledge, and Obsidian decisions.
 
 ## Global constraints
 
 - Keep the single-package, local-first design and root `app/` layout without `src/`.
 - No full chat, CLI, history, lesson writes, RAG, embeddings, MCP, agent loop, deployment, Docker, or background services in M1.
-- Never silently fall back from local inference to a cloud provider.
+- Never call cloud or silently fall back from local inference to a cloud provider in this MVP.
 - AI-generated lesson content must be previewed/edited and explicitly confirmed before it is written.
-- Do not download model weights, commit secrets, inspect secret-bearing env files, commit, or push.
+- Do not download additional model weights, commit secrets, inspect secret-bearing env files, or push.
 - Check current repository files and the installed Next.js guide before coding. Run only checks that exist or are intentionally added in the approved milestone.
 
-## M1 — Foundation (active scope)
+## M1 — Foundation (completed)
 
 ### BOSS — manual, phase entry gate
 
@@ -51,13 +51,12 @@ The active assignment is **M1 Foundation only**. M2–M4 are documented for late
 
 **M1 exit:** All handoff Definition of Done items are satisfied or the remaining blockers are named precisely. BOSS reviews the M1 report and explicitly starts M2.
 
-## M2 — Chat (future milestone; not currently authorized)
+## M2 — Chat (active)
 
-### BOSS — manual, phase entry gate
+### BOSS — decisions resolved 2026-10-20
 
-- Choose or approve the Ollama model to use and its resource/performance expectations on the 16 GB Apple Silicon machine. Install/start Ollama and obtain the model locally if a live chat acceptance run is expected; the agent must not download model weights.
-- Approve the conversation-history storage choice. SQLite is only a candidate in the handoff, not a settled requirement.
-- Approve data-retention expectations for local conversation history and the desired resume/delete behavior.
+- Use the existing local `qwen3.5:latest`; synthetic non-sensitive inference prompts are approved. Measure and report latency; there is no fixed target.
+- Agent chooses minimal local persistence and documents the trade-off. Keep history until explicit deletion, resume after restart, preserve interrupted responses, and delete history without deleting confirmed lessons.
 
 ### FE agent
 
@@ -78,13 +77,13 @@ The active assignment is **M1 Foundation only**. M2–M4 are documented for late
 - Verify a user can chat with the selected local model from Web and CLI, stop/resume a conversation, and see predictable provider errors.
 - Run the approved local checks plus a real Ollama acceptance run. Mark provider acceptance blocked if Ollama/model is unavailable.
 
-## M3 — Knowledge (future milestone; not currently authorized)
+## M3 — Knowledge (active after M2 contracts)
 
-### BOSS — manual, phase entry gate
+### BOSS — decisions resolved 2026-10-20
 
-- Finish or summarize Lesson 08 decisions that affect frontmatter, metadata, note organization, naming, and links. Approve the smallest MVP schema; do not require embeddings for the initial search.
-- Approve what conversation content may be saved, including any sensitive-data exclusion/redaction rules.
-- Approve the user review flow: generated lesson is a proposal, BOSS may edit it, and saving requires explicit confirmation.
+- Agent chooses a minimal Markdown schema in `knowledge/`; keyword/full-text search only, no embeddings.
+- Each knowledge item has a unique keyword/slug identity. Detect collisions before writing, never create duplicate knowledge or silently overwrite. When the same key has materially different/new information, show a diff and propose an additive update for BOSS review; only apply after explicit confirmation.
+- Use only content BOSS deliberately enters; exclude secrets, credentials, and company/customer data from acceptance fixtures. A lesson is a proposal and requires explicit review/confirmation before write. Automatic comprehensive secret redaction is not required or promised.
 
 ### FE agent
 
@@ -105,13 +104,12 @@ The active assignment is **M1 Foundation only**. M2–M4 are documented for late
 - Verify preview/edit/cancel/confirm, saved Markdown readback, search result provenance, and an answer grounded in a saved note.
 - Test malformed metadata, duplicate names, empty search results, and unsafe paths.
 
-## M4 — Integration (future milestone; not currently authorized)
+## M4 — Integration (active after M2 and M3)
 
-### BOSS — manual, phase entry gate
+### BOSS — decisions resolved 2026-10-20
 
-- Decide whether cloud providers are included in MVP. If yes, name the provider(s), approve the explicit selection and cost/privacy controls, and configure credentials privately in the local environment. Never place credentials in a plan or commit them.
-- Confirm the end-to-end MVP acceptance scenario and whether Obsidian opening/editing is a manual check on BOSS's machine.
-- Have the selected local provider/model available for the final local acceptance run.
+- MVP is local-only with Ollama `qwen3.5:latest`; cloud support is for a future phase. Do not add cloud adapters, API keys, selectors, or fallback behavior.
+- BOSS approved the end-to-end acceptance scenario and will manually open/read/edit a saved lesson in Obsidian after the implementation provides the exact vault and file path.
 
 ### FE agent
 
