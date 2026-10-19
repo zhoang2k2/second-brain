@@ -1,24 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: light dark;
-  --background: #f7f7f4;
-  --foreground: #1c2721;
+  color-scheme: light;
+  --background: #f4f5f1;
+  --surface: #ffffff;
+  --foreground: #1c2923;
+  --muted: #748078;
+  --border: #e6e9e4;
+  --accent: #336b55;
+  --accent-soft: #eaf2ec;
+  --warning: #8b5d2d;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+* {
+  box-sizing: border-box;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #141916;
-    --foreground: #edf1ed;
-  }
-}
-
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family:
@@ -28,4 +26,604 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.Workspace {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+.Workspace__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 26px 18px 18px;
+  border-right: 1px solid var(--border);
+  background: #fbfcfa;
+}
+.Workspace__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 5px;
+}
+.Workspace__brand strong,
+.Workspace__brand small {
+  display: block;
+}
+.Workspace__brand strong {
+  font-size: 15px;
+  letter-spacing: -0.02em;
+}
+.Workspace__brand small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.Workspace__mark {
+  display: grid;
+  width: 37px;
+  height: 37px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.Workspace__new {
+  width: 100%;
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  text-align: left;
+}
+.Workspace__new:hover,
+.Composer__send:hover {
+  background: #285640;
+}
+.Workspace__section-title {
+  display: block;
+  margin: 0 0 12px;
+  color: #879188;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.ConversationList ul,
+.SearchResults {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ConversationList__item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 4px 5px 4px 10px;
+  border-radius: 8px;
+}
+.ConversationList__item:hover {
+  background: #f0f3ef;
+}
+.ConversationList__open {
+  overflow: hidden;
+  flex: 1;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 13px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ConversationList__delete {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  opacity: 0;
+}
+.ConversationList__item:hover .ConversationList__delete,
+.ConversationList__delete:focus-visible {
+  opacity: 1;
+}
+.Workspace__muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+.SearchForm {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.SearchForm__row {
+  display: flex;
+  gap: 5px;
+}
+.SearchForm input,
+.LessonEditor input,
+.LessonEditor textarea,
+.Composer textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  outline: none;
+  background: white;
+  color: var(--foreground);
+}
+.SearchForm input {
+  min-width: 0;
+  padding: 9px;
+  font-size: 12px;
+}
+.SearchForm input:focus,
+.LessonEditor input:focus,
+.LessonEditor textarea:focus,
+.Composer textarea:focus {
+  border-color: #8db19d;
+  box-shadow: 0 0 0 3px #336b5517;
+}
+.SearchForm button {
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+.SearchResults {
+  margin-top: 12px;
+}
+.SearchResults__item {
+  display: grid;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: white;
+}
+.SearchResults__item strong {
+  font-size: 12px;
+}
+.SearchResults__item code {
+  color: var(--accent);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.SearchResults__item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.Workspace__privacy {
+  margin: auto 4px 0;
+  color: #879188;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.ChatPanel {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 28px 24px;
+}
+.ChatPanel__header {
+  display: flex;
+  width: min(100%, 850px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px 0 23px;
+  border-bottom: 1px solid var(--border);
+}
+.ChatPanel__header h1 {
+  max-width: 560px;
+  overflow: hidden;
+  margin: 7px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ChatPanel__eyebrow {
+  color: #8c978f;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+.ModelStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: white;
+  color: #56645b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.ModelStatus__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5a9c70;
+  box-shadow: 0 0 0 3px #5a9c701a;
+}
+.MessageList {
+  display: flex;
+  width: min(100%, 850px);
+  flex: 1;
+  flex-direction: column;
+  gap: 20px;
+  overflow: auto;
+  padding: 25px 0;
+}
+.Welcome {
+  display: grid;
+  flex: 1;
+  align-content: center;
+  justify-items: center;
+  padding: 40px 18px;
+  text-align: center;
+}
+.Welcome__symbol {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid #dfe9e0;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 24px;
+}
+.Welcome h2 {
+  margin: 20px 0 8px;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.Welcome p {
+  max-width: 440px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.Welcome__hint {
+  margin-top: 20px;
+  color: #8a958d;
+  font-size: 11px;
+}
+.Message {
+  max-width: min(88%, 760px);
+  padding: 15px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 3px 12px #18241c05;
+}
+.Message--user {
+  align-self: flex-end;
+  border-color: #dce8df;
+  background: #edf4ef;
+}
+.Message__role {
+  margin: 0 0 9px;
+  color: #78847c;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.MessageContent {
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.MessageContent > :first-child {
+  margin-top: 0;
+}
+.MessageContent > :last-child {
+  margin-bottom: 0;
+}
+.MessageContent p {
+  margin: 8px 0;
+}
+.MessageContent h1,
+.MessageContent h2,
+.MessageContent h3 {
+  margin: 17px 0 8px;
+  font-size: 1.12em;
+}
+.MessageContent ul,
+.MessageContent ol {
+  padding-left: 22px;
+}
+.MessageContent pre {
+  overflow: auto;
+  padding: 13px;
+  border-radius: 9px;
+  background: #1c2923;
+  color: #f3f6f3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.MessageContent code:not(pre code) {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #eef1ed;
+  color: #345a44;
+  font-size: 0.92em;
+}
+.MessageContent blockquote {
+  margin-left: 0;
+  padding-left: 13px;
+  border-left: 3px solid #b7cbbd;
+  color: var(--muted);
+}
+.Message__status,
+.Message__sources {
+  margin: 12px 0 0;
+  color: var(--warning);
+  font-size: 11px;
+}
+.Message__sources {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+.ChatPanel__error {
+  width: min(100%, 850px);
+  margin: 0 0 10px;
+  padding: 10px 13px;
+  border: 1px solid #f1d1c4;
+  border-radius: 9px;
+  background: #fff5f0;
+  color: #9a492c;
+  font-size: 12px;
+}
+.ChatPanel__saved {
+  width: min(100%, 850px);
+  color: var(--accent);
+  font-size: 12px;
+}
+.ChatPanel__save {
+  align-self: flex-start;
+  margin: -10px 0 12px max(0px, calc((100% - 850px) / 2));
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+.Composer {
+  width: min(100%, 850px);
+  padding: 13px;
+  border: 1px solid #dfe4de;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 8px 24px #1e30230a;
+}
+.Composer__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.Composer textarea {
+  min-height: 80px;
+  resize: vertical;
+  padding: 11px;
+  border-color: transparent;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.Composer textarea:focus {
+  border-color: #8db19d;
+}
+.Composer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 2px 0;
+  color: #89938c;
+  font-size: 10px;
+}
+.Composer__send,
+.Composer__stop {
+  padding: 9px 13px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+.Composer__send span {
+  margin-left: 6px;
+}
+.Composer__stop {
+  background: #f5ece8;
+  color: #97533b;
+}
+.LessonEditor {
+  width: min(100%, 850px);
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid #dfe4de;
+  border-radius: 13px;
+  background: white;
+}
+.LessonEditor__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.LessonEditor__heading h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+.LessonEditor__heading button {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: white;
+  color: var(--muted);
+  font-size: 11px;
+}
+.LessonEditor label {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+  color: #59665e;
+  font-size: 11px;
+  font-weight: 600;
+}
+.LessonEditor input,
+.LessonEditor textarea {
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 400;
+}
+.LessonEditor textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+.LessonEditor__preview {
+  max-height: 190px;
+  overflow: auto;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f6f8f5;
+}
+.LessonEditor__preview > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.LessonEditor__preview .MessageContent {
+  margin-top: 9px;
+  font-size: 12px;
+}
+.LessonConflict {
+  margin: 14px 0;
+  padding: 13px;
+  border: 1px solid #ead9bd;
+  border-radius: 9px;
+  background: #fffcf6;
+}
+.LessonConflict h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+.LessonConflict p {
+  margin: 10px 0 5px;
+  color: #786348;
+  font-size: 11px;
+  font-weight: 700;
+}
+.LessonConflict pre {
+  max-height: 150px;
+  overflow: auto;
+  margin: 0;
+  padding: 10px;
+  border-radius: 7px;
+  background: white;
+  font-size: 11px;
+  white-space: pre-wrap;
+}
+.LessonConflict__addition {
+  padding: 10px;
+  border-left: 3px solid #a9c6b2;
+  background: #f1f7f2;
+  font-size: 12px;
+}
+.LessonConflict button {
+  margin-top: 12px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: #8b5d2d;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .Workspace {
+    grid-template-columns: 1fr;
+  }
+  .Workspace__sidebar {
+    gap: 16px;
+    padding: 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ConversationList {
+    max-height: 150px;
+    overflow: auto;
+  }
+  .SearchForm {
+    padding-top: 12px;
+  }
+  .Workspace__privacy {
+    margin: 0;
+  }
+  .ChatPanel {
+    min-height: 70dvh;
+    padding: 0 14px 15px;
+  }
+  .ChatPanel__header {
+    padding: 19px 0 14px;
+  }
+  .ChatPanel__header h1 {
+    font-size: 17px;
+  }
+  .ModelStatus {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  .Message {
+    max-width: 96%;
+    padding: 12px 14px;
+  }
+  .MessageList {
+    padding: 16px 0;
+  }
 }

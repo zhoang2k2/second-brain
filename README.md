@@ -1,31 +1,45 @@
 # Second Brain
 
-A local-first personal AI workspace. The repository is currently at **M1 — Foundation**; chat, CLI, conversation history, lesson generation, and knowledge retrieval are not implemented yet.
+Ứng dụng AI cá nhân local-first. Chat và history chạy trên máy của bạn; lesson được lưu thành Markdown trong `knowledge/` để có thể mở bằng Obsidian.
 
-## Requirements
+## Yêu cầu
 
 - Node.js `>=20.9.0`
 - pnpm `10.24.0`
-- macOS is the current development environment; no GPU or model download is required for M1.
+- Ollama đang chạy tại `http://127.0.0.1:11434`
+- Model local `qwen3.5:latest` đã được cài. MVP không dùng model cloud và không tự fallback sang cloud.
 
-## Install and run
+## Cài đặt và chạy
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Mở [http://localhost:3000](http://localhost:3000). Nếu Ollama chạy ở local URL khác, đặt `OLLAMA_BASE_URL` trong `.env.local`; ứng dụng từ chối URL không phải loopback.
 
-## Local model configuration
+## Sử dụng CLI
 
-`.env.example` documents `OLLAMA_BASE_URL`, with `http://localhost:11434` as the local Ollama endpoint. Copy it to `.env.local` when preparing for a future Ollama integration:
+Giữ web server đang chạy, sau đó mở terminal khác:
 
 ```bash
-cp .env.example .env.local
+pnpm chat
 ```
 
-M1 does not read this variable or connect to Ollama. A health/connectivity endpoint is deferred until it can be tested against a real local runtime. The application will not send requests to a cloud provider.
+CLI tạo conversation và gọi cùng `/api/chat` với Web. Dùng `Ctrl+C` để dừng response hiện tại và giữ lại phần text đã nhận; dùng `/exit` để thoát. Để mở lại conversation:
+
+```bash
+pnpm chat <conversation-id>
+```
+
+## History và knowledge
+
+- History lưu cục bộ tại `data/second-brain.json`, giữ đến khi xóa conversation.
+- Conversation có thể tiếp tục sau khi khởi động lại ứng dụng. Response còn `streaming` sau restart được đánh dấu `interrupted`.
+- Xóa conversation không xóa lesson đã lưu.
+- Lesson được preview, chỉnh sửa hoặc hủy trước khi ghi. Markdown được lưu trong `knowledge/` với title, tags, thời điểm tạo/cập nhật và source conversation.
+- Tên lesson trùng bị từ chối; ứng dụng không ghi đè. Keyword search hiện tìm title/nội dung Markdown và trả source path cùng snippet.
+- Chỉ đưa nội dung bạn chủ động nhập vào ứng dụng. Không nhập secret, credential hoặc dữ liệu công ty/khách hàng.
 
 ## Quality checks
 
@@ -33,20 +47,12 @@ M1 does not read this variable or connect to Ollama. A health/connectivity endpo
 pnpm format:check
 pnpm lint
 pnpm typecheck
+pnpm test
 pnpm build
 ```
 
-M1 contains no domain behavior and does not add a test framework. Use a focused test for the first independently testable logic in a later milestone, and add end-to-end coverage when the chat and knowledge flows exist. The current boot check is to run `pnpm dev` and confirm the landing page loads.
+## Ranh giới MVP
 
-## Knowledge vault
+MVP hỗ trợ Web chat streaming, CLI chat, history local, dừng response, lesson preview/confirm, Markdown keyword search và trả source paths khi dùng context từ knowledge. Chưa có cloud provider, embeddings, vector search, automatic secret redaction, đồng bộ hoặc nhiều người dùng. Lưu history dùng JSON file và khóa ghi trong một process; không thiết kế cho nhiều server process ghi chung một thư mục data.
 
-`knowledge/` is reserved for Markdown notes and can be opened as an Obsidian vault. Markdown will remain the durable source of truth. M1 adds no sample lessons, frontmatter schema, local database, or generated index.
-
-## Current scope and next milestones
-
-- **M1 — Foundation:** minimal Next.js shell, local configuration example, knowledge placeholder, and quality commands.
-- **M2 — Chat:** Web and CLI chat, local Ollama integration, streaming, and conversation history.
-- **M3 — Knowledge:** reviewed lesson creation and basic Markdown search.
-- **M4 — Integration:** explicit provider choice and the end-to-end MVP scenario.
-
-Only M1 is in the active implementation scope. Later milestones require their own owner-approved entry criteria. See [`doc/plans/phase-1-mvp.md`](doc/plans/phase-1-mvp.md).
+Mở `knowledge/` trong Obsidian để đọc hoặc chỉnh lesson. Người dùng cần tự kiểm tra file trong Obsidian trước khi đánh dấu nghiệm thu owner.
