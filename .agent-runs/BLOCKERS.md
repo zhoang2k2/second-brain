@@ -2,7 +2,7 @@
 
 ## MVP
 
-- Phase 1 is not accepted. Must fix: concurrent identical lesson additions can both succeed and duplicate the content; reproduced 3/3 times. See `.agent-runs/reports/2026-10-20-mvp-status-audit.md` for the acceptance ledger and additional findings.
+- Phase 1 is not accepted. The concurrent duplicate-addition defect is fixed in `14c2c5e` (in-process only) and validated on 2026-10-21. Remaining gates are owner-side acceptance and P1-O3. See `.agent-runs/reports/2026-10-20-mvp-status-audit.md` for the acceptance ledger and additional findings.
 - The existing knowledge folder has been opened in Obsidian and its saved lesson is visible in the file list. Owner acceptance is pending for manually reading/editing that lesson at `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/`.
 - Partial-token cancellation is now verified at API level: 36 received characters were preserved within 39 saved characters and status `interrupted`. Browser/CLI failure-state acceptance and abrupt-process-crash behavior are narrower or unverified cases; do not infer those from this API result.
 - Completion evidence is in `.agent-runs/reports/2026-10-20-mvp-completion.md`.
