@@ -1,15 +1,18 @@
 # Handoff
 
-The project is in Phase 1 MVP stabilization and acceptance on `feature/m2`, not Phase 2. Core M2–M4 features exist, but the MVP is NOT DONE / NOT ACCEPTED. Read `.agent-runs/reports/2026-10-20-mvp-status-audit.md` first: it supersedes earlier completion wording and records a reproduced duplicate lesson-update race plus the remaining acceptance work.
+Phase 1 technical work and local acceptance are complete on `feature/m2`, product revision `5ff2a14`. Current state is **Chờ owner nghiệm thu**, not accepted/done. P1-O5 Obsidian read/edit and P1-O6 final owner acceptance remain. Phase 2 has not started.
 
-The folder `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/` is now registered and open in Obsidian; `hello` and `README` were visible in its file list. BOSS's manual read/edit acceptance remains. The existing user lesson was preserved and excluded from the fix commit.
+Read `.agent-runs/reports/2026-10-21-phase-1-acceptance-handoff.md` for the row-by-row P1-O4 matrix, failure-path evidence, crash recovery, latency observations, verification results and owner steps.
 
-Chat stream synchronization was fixed and verified in production. See `.agent-runs/reports/2026-10-20-chat-response-and-vault.md` for the reproduction, request contract, and current context/temperature limitations.
+## BOSS — P1-O5
 
-The current request additionally sets `think: false` to reduce first-answer latency. The model defaults to extended thinking, which the UI did not display. Controlled measurements and a 1.208-second warm first-answer application check are recorded in `.agent-runs/reports/2026-10-20-chat-latency.md`.
+1. Open the running preview: `http://127.0.0.1:3210`.
+2. Send a non-sensitive prompt, choose **Lưu câu trả lời thành lesson**, review/edit the title and Markdown, then confirm. Record the path shown by the app.
+3. In Obsidian, choose **Manage vaults… → Open folder as vault → Open**. In the Mac folder picker, press `Cmd+Shift+G` and open:
 
-Cloud remains excluded. No push, deploy, or merge was performed. Phase 2 has not been authorized.
+   `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/`
 
-Latest: checkpointed streaming, visible provider errors and Vietnamese UI committed on `feature/m2` (report `2026-10-21-checkpoint-and-vi-localization.md`). Next independent item: MVP-02 timestamp decision; then owner acceptance.
+4. Open the lesson created in step 2, read it and add a short non-sensitive line. Return to the app and search for a distinctive phrase from that line.
+5. Report the lesson name and whether read, edit and search worked, with the check time. Then record P1-O6 as `Đạt` or `Chưa đạt: ...` against product revision `5ff2a14`.
 
-Latest (2026-10-21, later): MVP-02 is closed and the full validation suite passes (28/28 tests, build green). Nothing independent remains on `feature/m2`; next steps are owner-driven: MVP-05 acceptance records, Obsidian read/edit of a reviewed lesson, and P1-O3. Nothing was pushed, deployed or merged.
+The existing `knowledge/hello.md` was preserved. No acceptance fixture remains in the vault. The worktree has not been pushed, deployed or merged.

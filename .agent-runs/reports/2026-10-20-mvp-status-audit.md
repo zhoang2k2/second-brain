@@ -2,6 +2,8 @@
 
 Date: 2026-10-20
 
+> Historical audit snapshot. MVP-01–05 were resolved and the P1-O4 acceptance matrix was run on product revision `5ff2a14`; see [the 2026-10-21 Phase 1 handoff](2026-10-21-phase-1-acceptance-handoff.md) for current status and owner gates.
+
 Audited product revision: `863fe65` on `feature/m2`.
 
 ## Verdict
