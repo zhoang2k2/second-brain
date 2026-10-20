@@ -12,3 +12,7 @@
 - Phase 2 requires approval of memory lifecycle, sharing boundaries, retrieval evaluation, and any MCP permissions.
 - Phase 3 requires approved targets, action permissions, limits, observation scope, and a qualified isolation mechanism.
 - Phase 4 requires a target host/model/runtime, measurable offline scope, access model, and backup/recovery objectives.
+
+## Update 2026-10-21
+
+- MVP-03 and MVP-04 mitigated (see checkpoint report). Open: MVP-02, MVP-05, BOSS Obsidian acceptance, P1-O3. All owner-gated; nothing else blocks independent work.

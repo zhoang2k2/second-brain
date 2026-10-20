@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import type { ChatStreamEvent } from "@/lib/chatTypes";
+import { createCheckpointer } from "@/lib/checkpoint";
 import { getCitedSources } from "@/lib/citations";
 import { searchKnowledge } from "@/lib/knowledge";
 import { getOllamaBaseUrl, streamOllamaChat } from "@/lib/ollama";
@@ -17,7 +18,7 @@ export const POST = async (request: Request) => {
     input = (await request.json()) as ChatRequest;
   } catch {
     return NextResponse.json(
-      { error: "Request body must be valid JSON." },
+      { error: "Nội dung yêu cầu phải là JSON hợp lệ." },
       { status: 400 },
     );
   }
@@ -26,8 +27,7 @@ export const POST = async (request: Request) => {
   if (!input.conversationId || !message || message.length > 20_000) {
     return NextResponse.json(
       {
-        error:
-          "Conversation ID and a message of at most 20,000 characters are required.",
+        error: "Cần ID cuộc trò chuyện và tin nhắn tối đa 20.000 ký tự.",
       },
       { status: 400 },
     );
@@ -38,7 +38,7 @@ export const POST = async (request: Request) => {
     conversation = await store.getConversation(input.conversationId);
     if (!conversation)
       return NextResponse.json(
-        { error: "Conversation not found." },
+        { error: "Không tìm thấy cuộc trò chuyện." },
         { status: 404 },
       );
     getOllamaBaseUrl();
@@ -48,7 +48,7 @@ export const POST = async (request: Request) => {
         error:
           error instanceof Error
             ? error.message
-            : "Chat configuration is invalid.",
+            : "Cấu hình chat không hợp lệ.",
       },
       { status: 400 },
     );
@@ -61,7 +61,9 @@ export const POST = async (request: Request) => {
     return NextResponse.json(
       {
         error:
-          error instanceof Error ? error.message : "Knowledge search failed.",
+          error instanceof Error
+            ? error.message
+            : "Tìm kiếm knowledge thất bại.",
       },
       { status: 500 },
     );
@@ -86,6 +88,14 @@ export const POST = async (request: Request) => {
   const body = new ReadableStream<Uint8Array>({
     start(controller) {
       let content = "";
+      const checkpointer = createCheckpointer((partial) =>
+        store.updateMessage(
+          conversation.id,
+          assistant.id,
+          partial,
+          "streaming",
+        ),
+      );
       controller.enqueue(encodeEvent({ type: "start", message: assistant }));
       const run = async () => {
         try {
@@ -97,6 +107,7 @@ export const POST = async (request: Request) => {
             knowledge,
           )) {
             content += chunk;
+            checkpointer.update(content);
             controller.enqueue(
               encodeEvent({
                 type: "delta",
@@ -105,6 +116,7 @@ export const POST = async (request: Request) => {
               }),
             );
           }
+          await checkpointer.flush();
           const sources = getCitedSources(content, knowledge);
           await store.updateMessage(
             conversation.id,
@@ -125,6 +137,7 @@ export const POST = async (request: Request) => {
         } catch (error) {
           if (completed) return;
           const interrupted = responseController.signal.aborted;
+          await checkpointer.flush();
           await store.updateMessage(
             conversation.id,
             assistant.id,
@@ -138,7 +151,7 @@ export const POST = async (request: Request) => {
               message:
                 error instanceof Error
                   ? error.message
-                  : "Local model request failed.",
+                  : "Model local không phản hồi được.",
             }),
           );
           controller.close();

@@ -18,6 +18,9 @@ export type {
 
 type StoreData = { version: 1; conversations: Conversation[] };
 
+const DEFAULT_TITLE = "Cuộc trò chuyện mới";
+const DEFAULT_TITLES = new Set([DEFAULT_TITLE, "New conversation"]);
+
 const createEmptyData = (): StoreData => ({ version: 1, conversations: [] });
 
 export const createStore = (
@@ -31,7 +34,7 @@ export const createStore = (
         await readFile(/*turbopackIgnore: true*/ filePath, "utf8"),
       ) as StoreData;
       if (data.version !== 1 || !Array.isArray(data.conversations)) {
-        throw new Error("Conversation data has an unsupported format.");
+        throw new Error("Dữ liệu lịch sử có định dạng không hỗ trợ.");
       }
       return data;
     } catch (error) {
@@ -97,7 +100,7 @@ export const createStore = (
         const now = new Date().toISOString();
         const conversation = {
           id: randomUUID(),
-          title: "New conversation",
+          title: DEFAULT_TITLE,
           createdAt: now,
           updatedAt: now,
           messages: [],
@@ -139,9 +142,8 @@ export const createStore = (
           sources,
         };
         conversation.messages.push(message);
-        if (role === "user" && conversation.title === "New conversation") {
-          conversation.title =
-            content.trim().slice(0, 60) || "New conversation";
+        if (role === "user" && DEFAULT_TITLES.has(conversation.title)) {
+          conversation.title = content.trim().slice(0, 60) || DEFAULT_TITLE;
         }
         conversation.updatedAt = message.createdAt;
         return message;

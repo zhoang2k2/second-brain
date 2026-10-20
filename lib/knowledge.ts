@@ -98,11 +98,11 @@ export const createLessonMarkdown = (lesson: LessonInput): string => {
   const tags = lesson.tags.map((tag) => tag.trim()).filter(Boolean);
 
   if (!title || !content || !createSlug(title)) {
-    throw new Error("Lesson title and content are required.");
+    throw new Error("Cần tiêu đề và nội dung lesson.");
   }
 
   if (tags.some((tag) => tag.length > 40)) {
-    throw new Error("Lesson tags must be 40 characters or fewer.");
+    throw new Error("Mỗi tag lesson tối đa 40 ký tự.");
   }
 
   const createdAt = lesson.createdAt ?? new Date().toISOString();
@@ -127,7 +127,7 @@ export const createAdditiveLessonMarkdown = (
   updatedAt = new Date().toISOString(),
 ): string => {
   const content = addition.trim();
-  if (!content) throw new Error("Lesson content is required.");
+  if (!content) throw new Error("Cần nội dung lesson.");
   const body = existingMarkdown.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
   if (body.includes(content)) throw new Error("LESSON_DUPLICATE_CONTENT");
   const updatedFrontmatter = existingMarkdown.replace(
@@ -194,7 +194,7 @@ export const appendToLesson = async (
   slug: string,
   content: string,
 ): Promise<{ path: string }> => {
-  if (createSlug(slug) !== slug) throw new Error("Invalid lesson key.");
+  if (createSlug(slug) !== slug) throw new Error("Khóa lesson không hợp lệ.");
   const files = await listMarkdownFiles(KNOWLEDGE_DIRECTORY);
   const collision = findLessonCollision(slug, files);
   if (!collision) throw new Error("LESSON_NOT_FOUND");
@@ -218,7 +218,7 @@ export const appendLessonUpdate = async (
   try {
     const existingMarkdown = await readFile(filePath, "utf8");
     const addition = content.trim();
-    if (!addition) throw new Error("Lesson content is required.");
+    if (!addition) throw new Error("Cần nội dung lesson.");
     const body = existingMarkdown.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
     if (body.includes(addition)) throw new Error("LESSON_DUPLICATE_CONTENT");
     const updatedAt = new Date().toISOString();

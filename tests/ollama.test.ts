@@ -21,8 +21,31 @@ afterEach(async () => {
 describe("local Ollama adapter", () => {
   it("rejects non-local provider URLs", () => {
     expect(() => getOllamaBaseUrl("https://example.com")).toThrow(
-      "local Ollama",
+      "Ollama local",
     );
+  });
+
+  it("explains how to recover when local Ollama is not running", async () => {
+    const server = createServer();
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", () => resolve()),
+    );
+    const address = server.address();
+    if (!address || typeof address === "string")
+      throw new Error("Expected a local TCP address");
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    const consume = async () => {
+      for await (const chunk of streamOllamaChat(
+        "hi",
+        [],
+        new AbortController().signal,
+        `http://127.0.0.1:${address.port}`,
+      ))
+        void chunk;
+    };
+
+    await expect(consume()).rejects.toThrow("Không kết nối được Ollama");
   });
 
   it("streams content from the explicitly selected local model", async () => {

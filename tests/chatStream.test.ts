@@ -87,7 +87,7 @@ describe("chat streaming state", () => {
     });
 
     await expect(readChatStream(stream, () => undefined)).rejects.toThrow(
-      "before the response completed",
+      "trước khi câu trả lời hoàn tất",
     );
   });
 });

@@ -12,7 +12,7 @@ export const getOllamaBaseUrl = (
   try {
     url = new URL(value);
   } catch {
-    throw new Error("Set OLLAMA_BASE_URL to a local Ollama URL.");
+    throw new Error("OLLAMA_BASE_URL phải là địa chỉ Ollama local.");
   }
 
   if (
@@ -21,7 +21,7 @@ export const getOllamaBaseUrl = (
     url.username ||
     url.password
   ) {
-    throw new Error("Only a local Ollama URL is allowed in this MVP.");
+    throw new Error("MVP chỉ cho phép địa chỉ Ollama local.");
   }
 
   return url.toString().replace(/\/$/, "");
@@ -52,7 +52,8 @@ export const streamOllamaChat = async function* (
   baseUrl = getOllamaBaseUrl(),
   knowledge: KnowledgeResult[] = [],
 ): AsyncGenerator<string> {
-  const response = await fetch(`${getOllamaBaseUrl(baseUrl)}/api/chat`, {
+  const url = getOllamaBaseUrl(baseUrl);
+  const response = await fetch(`${url}/api/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -62,12 +63,17 @@ export const streamOllamaChat = async function* (
       messages: createMessages(prompt, history, knowledge),
     }),
     signal,
+  }).catch((error: unknown) => {
+    if (signal.aborted) throw error;
+    throw new Error(
+      `Không kết nối được Ollama tại ${url}. Hãy mở Ollama rồi thử lại.`,
+    );
   });
 
   if (!response.ok || !response.body) {
     const detail = await response.text().catch(() => "");
     throw new Error(
-      `Ollama request failed (${response.status})${detail ? `: ${detail.slice(0, 240)}` : ""}`,
+      `Ollama trả lỗi (${response.status})${detail ? `: ${detail.slice(0, 240)}` : ""}`,
     );
   }
 

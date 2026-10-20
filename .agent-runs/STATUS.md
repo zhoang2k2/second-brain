@@ -9,3 +9,4 @@
 - Fresh API cancellation acceptance passed: 36 characters received, 39 saved, status `interrupted`, received prefix preserved. The after-unload request took 30.404 seconds to reach the cancellation point; the earlier short warm result is not a latency guarantee. Abrupt-process-crash preservation remains unproven.
 - No push, deploy, or merge was performed. Phase 2 is not authorized by this MVP task.
 - 2026-10-21: full validation re-run on committed tree (format, lint, typecheck, test 22/22, build, diff check) passed, including the build after the race fix. See `.agent-runs/reports/2026-10-21-post-fix-validation.md`. Only owner-gated acceptance remains.
+- 2026-10-21: streaming checkpoint (MVP-04), provider-error visibility (MVP-03) and Vietnamese localization committed; 27/27 tests, build passed. See `.agent-runs/reports/2026-10-21-checkpoint-and-vi-localization.md`. Remaining: MVP-02, MVP-05, owner acceptance.

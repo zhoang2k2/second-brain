@@ -9,7 +9,7 @@ export const GET = async (
   const conversation = await store.getConversation(id);
   if (!conversation)
     return NextResponse.json(
-      { error: "Conversation not found." },
+      { error: "Không tìm thấy cuộc trò chuyện." },
       { status: 404 },
     );
   return NextResponse.json(conversation);
@@ -23,7 +23,7 @@ export const DELETE = async (
   const deleted = await store.deleteConversation(id);
   if (!deleted)
     return NextResponse.json(
-      { error: "Conversation not found." },
+      { error: "Không tìm thấy cuộc trò chuyện." },
       { status: 404 },
     );
   return new Response(null, { status: 204 });

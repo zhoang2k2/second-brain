@@ -60,7 +60,7 @@ export const readChatStream = async (
 
       if (!done) continue;
       if (applyLine(buffer)) return;
-      throw new Error("The connection closed before the response completed.");
+      throw new Error("Kết nối bị đóng trước khi câu trả lời hoàn tất.");
     }
   } finally {
     reader.releaseLock();

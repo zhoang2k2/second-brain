@@ -19,9 +19,9 @@ type LessonConflict = { path: string; markdown: string };
 const readError = async (response: Response): Promise<string> => {
   try {
     const body = (await response.json()) as { error?: string };
-    return body.error ?? `Request failed (${response.status}).`;
+    return body.error ?? `Yêu cầu thất bại (${response.status}).`;
   } catch {
-    return `Request failed (${response.status}).`;
+    return `Yêu cầu thất bại (${response.status}).`;
   }
 };
 
@@ -74,7 +74,7 @@ export const ChatWorkspace = () => {
           setError(
             cause instanceof Error
               ? cause.message
-              : "Could not load conversations.",
+              : "Không tải được danh sách cuộc trò chuyện.",
           );
       });
     return () => {
@@ -151,15 +151,16 @@ export const ChatWorkspace = () => {
       });
       await refreshConversations();
     } catch (cause) {
-      if (!(cause instanceof Error && cause.name === "AbortError")) {
-        setError(
-          cause instanceof Error
+      const failure =
+        cause instanceof Error && cause.name === "AbortError"
+          ? ""
+          : cause instanceof Error
             ? cause.message
-            : "The local model request failed.",
-        );
-      }
+            : "Model local không phản hồi được.";
       if (conversationIdForRefresh)
         await openConversation(conversationIdForRefresh).catch(() => undefined);
+      // openConversation clears the error, so set the provider detail after it.
+      if (failure) setError(failure);
     } finally {
       abortController.current = null;
       setBusy(false);
@@ -275,27 +276,26 @@ export const ChatWorkspace = () => {
   const messageItems = messages.map((message) => (
     <article className={`Message Message--${message.role}`} key={message.id}>
       <p className="Message__role">
-        {message.role === "user" ? "You" : "Second Brain"}
+        {message.role === "user" ? "Bạn" : "Second Brain"}
       </p>
       <MessageContent
         content={
-          message.content || (message.status === "streaming" ? "Thinking…" : "")
+          message.content ||
+          (message.status === "streaming" ? "Đang suy nghĩ…" : "")
         }
       />
       {message.status === "interrupted" ? (
         <p className="Message__status">
-          Interrupted. The received text is saved.
+          Đã dừng. Phần nội dung đã nhận được giữ lại.
         </p>
       ) : null}
       {message.status === "error" ? (
         <p className="Message__status">
-          The local model could not finish this response.
+          Model local không hoàn tất được câu trả lời này.
         </p>
       ) : null}
       {message.sources.length > 0 ? (
-        <p className="Message__sources">
-          Sources: {message.sources.join(", ")}
-        </p>
+        <p className="Message__sources">Nguồn: {message.sources.join(", ")}</p>
       ) : null}
     </article>
   ));
@@ -309,12 +309,12 @@ export const ChatWorkspace = () => {
 
   return (
     <main className="Workspace">
-      <aside aria-label="Workspace navigation" className="Workspace__sidebar">
+      <aside aria-label="Điều hướng" className="Workspace__sidebar">
         <div className="Workspace__brand">
           <span className="Workspace__mark">SB</span>
           <div>
             <strong>Second Brain</strong>
-            <small>Local workspace</small>
+            <small>Chạy trên máy của bạn</small>
           </div>
         </div>
         <button
@@ -358,11 +358,11 @@ export const ChatWorkspace = () => {
           ) : null}
         </form>
         <p className="Workspace__privacy">
-          Conversation và lesson được lưu trong checkout này.
+          Cuộc trò chuyện và lesson được lưu trên máy này.
         </p>
       </aside>
 
-      <section aria-label="Chat workspace" className="ChatPanel">
+      <section aria-label="Khung chat" className="ChatPanel">
         <header className="ChatPanel__header">
           <div>
             <span className="ChatPanel__eyebrow">AI CÁ NHÂN</span>
@@ -399,8 +399,8 @@ export const ChatWorkspace = () => {
         ) : null}
         {savedPath ? (
           <p className="ChatPanel__saved" role="status">
-            Saved to <code>{savedPath}</code>. Open <code>knowledge/</code> as
-            an Obsidian vault.
+            Đã lưu vào <code>{savedPath}</code>. Mở thư mục{" "}
+            <code>knowledge/</code> bằng Obsidian để xem.
           </p>
         ) : null}
         {lastAssistantMessage && !lessonOpen ? (
@@ -465,7 +465,7 @@ export const ChatWorkspace = () => {
             </div>
             {lessonConflict ? (
               <section
-                aria-label="Additive lesson proposal"
+                aria-label="Đề xuất bổ sung lesson"
                 className="LessonConflict"
               >
                 <h3>Đề xuất bổ sung vào {lessonConflict.path}</h3>
@@ -507,7 +507,7 @@ export const ChatWorkspace = () => {
             value={draft}
           />
           <div className="Composer__footer">
-            <span>Inference local · Lưu lịch sử conversation</span>
+            <span>Xử lý trên máy · Có lưu lịch sử</span>
             {busy ? (
               <button
                 className="Composer__stop"

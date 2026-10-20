@@ -7,16 +7,14 @@ if (
   parsedBaseUrl.protocol !== "http:" ||
   !localHosts.has(parsedBaseUrl.hostname)
 ) {
-  throw new Error(
-    "SECOND_BRAIN_URL must point to a local Second Brain server.",
-  );
+  throw new Error("SECOND_BRAIN_URL phải trỏ tới server Second Brain local.");
 }
 
 const request = async (path, options) => {
   const response = await fetch(new URL(path, parsedBaseUrl), options);
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.error ?? `Request failed (${response.status}).`);
+    throw new Error(body.error ?? `Yêu cầu thất bại (${response.status}).`);
   }
   return response;
 };
@@ -28,9 +26,9 @@ const conversation = existingId
     ).json()
   : await (await request("/api/conversations", { method: "POST" })).json();
 
-console.log(`Conversation: ${conversation.id}`);
+console.log(`Cuộc trò chuyện: ${conversation.id}`);
 console.log(
-  "Type a message. Use Ctrl+C to stop the current response, or type /exit to quit.",
+  "Nhập tin nhắn. Ctrl+C để dừng câu trả lời đang chạy, gõ /exit để thoát.",
 );
 
 const readline = createInterface({
@@ -42,7 +40,7 @@ let activeController;
 readline.on("SIGINT", () => {
   if (activeController) {
     activeController.abort();
-    console.log("\nResponse stopped. The received text has been saved.");
+    console.log("\nĐã dừng. Phần nội dung đã nhận được giữ lại.");
     return;
   }
   readline.close();
@@ -75,16 +73,16 @@ try {
           const event = JSON.parse(eventLine);
           if (event.type === "delta") process.stdout.write(event.content);
           if (event.type === "error")
-            console.error(`\nLocal model error: ${event.message}`);
+            console.error(`\nLỗi model local: ${event.message}`);
           if (event.type === "done" && event.sources.length)
-            console.log(`\nSources: ${event.sources.join(", ")}`);
+            console.log(`\nNguồn: ${event.sources.join(", ")}`);
         }
         if (done) break;
       }
       if (buffer) {
         const event = JSON.parse(buffer);
         if (event.type === "error")
-          console.error(`\nLocal model error: ${event.message}`);
+          console.error(`\nLỗi model local: ${event.message}`);
       }
       console.log("\n");
     } catch (error) {

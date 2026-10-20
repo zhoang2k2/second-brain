@@ -5,7 +5,7 @@ export const GET = async (request: Request) => {
   const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";
   if (query.length > 500)
     return NextResponse.json(
-      { error: "Search query is too long." },
+      { error: "Từ khóa tìm kiếm quá dài." },
       { status: 400 },
     );
   return NextResponse.json(await searchKnowledge(query));
