@@ -73,6 +73,35 @@ describe("knowledge helpers", () => {
     }
   });
 
+  it("rejects a duplicate lesson update submitted concurrently", async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), "second-brain-"));
+    const filePath = path.join(directory, "lesson.md");
+    await writeFile(filePath, "---\ntitle: Lesson\n---\n\nOriginal", "utf8");
+
+    try {
+      const results = await Promise.allSettled([
+        appendLessonUpdate(filePath, "Same update"),
+        appendLessonUpdate(filePath, "Same update"),
+      ]);
+      const saved = await readFile(filePath, "utf8");
+
+      expect(
+        results.filter((result) => result.status === "fulfilled"),
+      ).toHaveLength(1);
+      expect(
+        results.filter((result) => result.status === "rejected"),
+      ).toHaveLength(1);
+      expect(
+        results.find((result) => result.status === "rejected")?.reason,
+      ).toMatchObject({
+        message: "LESSON_DUPLICATE_CONTENT",
+      });
+      expect(saved.match(/Same update/g)).toHaveLength(1);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
   it("does not return notes that match only common question words", () => {
     expect(
       scoreKnowledgeDocument(

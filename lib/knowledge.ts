@@ -76,6 +76,7 @@ const SEARCH_STOP_WORDS = new Set([
 ]);
 
 const KNOWLEDGE_DIRECTORY = path.join(process.cwd(), "knowledge");
+const lessonUpdateQueues = new Map<string, Promise<void>>();
 
 export const createSlug = (title: string): string =>
   title
@@ -205,15 +206,32 @@ export const appendLessonUpdate = async (
   filePath: string,
   content: string,
 ): Promise<void> => {
-  const existingMarkdown = await readFile(filePath, "utf8");
-  const addition = content.trim();
-  if (!addition) throw new Error("Lesson content is required.");
-  const body = existingMarkdown.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
-  if (body.includes(addition)) throw new Error("LESSON_DUPLICATE_CONTENT");
-  const updatedAt = new Date().toISOString();
-  await appendFile(filePath, `\n\n## Update (${updatedAt})\n\n${addition}\n`, {
-    encoding: "utf8",
+  const queueKey = path.resolve(filePath);
+  const previous = lessonUpdateQueues.get(queueKey) ?? Promise.resolve();
+  let releaseQueue!: () => void;
+  const queued = new Promise<void>((resolve) => {
+    releaseQueue = resolve;
   });
+  lessonUpdateQueues.set(queueKey, queued);
+  await previous;
+
+  try {
+    const existingMarkdown = await readFile(filePath, "utf8");
+    const addition = content.trim();
+    if (!addition) throw new Error("Lesson content is required.");
+    const body = existingMarkdown.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
+    if (body.includes(addition)) throw new Error("LESSON_DUPLICATE_CONTENT");
+    const updatedAt = new Date().toISOString();
+    await appendFile(
+      filePath,
+      `\n\n## Update (${updatedAt})\n\n${addition}\n`,
+      { encoding: "utf8" },
+    );
+  } finally {
+    releaseQueue();
+    if (lessonUpdateQueues.get(queueKey) === queued)
+      lessonUpdateQueues.delete(queueKey);
+  }
 };
 
 export const getLessonBySlug = async (
