@@ -58,6 +58,7 @@ export const streamOllamaChat = async function* (
     body: JSON.stringify({
       model: OLLAMA_MODEL,
       stream: true,
+      think: false,
       messages: createMessages(prompt, history, knowledge),
     }),
     signal,

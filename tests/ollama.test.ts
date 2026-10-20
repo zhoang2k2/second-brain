@@ -34,24 +34,14 @@ describe("local Ollama adapter", () => {
       status: "complete",
       sources: [],
     }));
+    let requestBody = "";
+    let requestPath: string | undefined;
     const server = createServer((request, response) => {
-      expect(request.url).toBe("/api/chat");
+      requestPath = request.url;
       let body = "";
       request.on("data", (chunk: Buffer) => (body += chunk.toString()));
       request.on("end", () => {
-        const payload = JSON.parse(body);
-        expect(payload.model).toBe("qwen3.5:latest");
-        expect(payload.stream).toBe(true);
-        expect(payload.messages).toHaveLength(22);
-        expect(payload.messages[1]).toEqual({
-          role: "user",
-          content: "history-2",
-        });
-        expect(payload.messages.at(-1)).toEqual({
-          role: "user",
-          content: "hello",
-        });
-        expect(payload).not.toHaveProperty("options");
+        requestBody = body;
         response.writeHead(200, { "content-type": "application/x-ndjson" });
         response.end(
           '{"message":{"content":"hello"},"done":false}\n{"message":{"content":" world"},"done":true}\n',
@@ -76,6 +66,20 @@ describe("local Ollama adapter", () => {
       chunks.push(chunk);
     }
 
+    const payload = JSON.parse(requestBody) as {
+      model: string;
+      stream: boolean;
+      think: boolean;
+      messages: { role: string; content: string }[];
+    };
+    expect(requestPath).toBe("/api/chat");
+    expect(payload.model).toBe("qwen3.5:latest");
+    expect(payload.stream).toBe(true);
+    expect(payload.think).toBe(false);
+    expect(payload.messages).toHaveLength(22);
+    expect(payload.messages[1]).toEqual({ role: "user", content: "history-2" });
+    expect(payload.messages.at(-1)).toEqual({ role: "user", content: "hello" });
+    expect(payload).not.toHaveProperty("options");
     expect(chunks).toEqual(["hello", " world"]);
   });
 
