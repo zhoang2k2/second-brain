@@ -2,6 +2,8 @@
 
 Ứng dụng AI cá nhân local-first. Chat và history chạy trên máy của bạn; lesson được lưu thành Markdown trong `knowledge/` để có thể mở bằng Obsidian.
 
+Việc BOSS cần chuẩn bị: [checklist từng phase, có hướng dẫn tiếng Việt và mẫu trả lời](doc/plans/owner-preparation/README.md).
+
 ## Yêu cầu
 
 - Node.js `>=20.9.0`
