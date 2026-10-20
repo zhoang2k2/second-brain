@@ -27,6 +27,21 @@ Ba trạng thái cần phân biệt:
 
 Đánh dấu đủ quyết định không đồng nghĩa sản phẩm đã xong. Tác vụ cần login, cấp quyền hệ điều hành, xác nhận thao tác cụ thể hoặc nghiệm thu trực tiếp vẫn có thể cần BOSS ở thời điểm thực hiện. Việc này được ghi trước trong từng checklist.
 
+## Chạy agent xuyên đêm, không hỏi giữa chừng
+
+Khi BOSS đã gửi checklist phase và câu lệnh ủy quyền, agent có thể tự triển khai các việc đã nằm trong scope mà không hỏi duyệt từng bước thông thường: đọc/sửa code trong repo đã chọn, tạo synthetic fixtures, chạy checks được duyệt, sửa lỗi liên quan và commit local trên feature branch.
+
+Để agent không phải chờ quyết định giữa chừng:
+
+1. Trả lời mọi task bắt buộc trước triển khai trong phase đó; task có điều kiện phải ghi rõ `Đưa vào` hoặc `Không thuộc phase`.
+2. Ghi sẵn quyền, giới hạn thời gian/tài nguyên, dữ liệu được dùng, tiêu chí đạt và các mục bị cấm.
+3. Cấu hình trước credential ở secret store/runtime đã duyệt; đăng nhập client và cấp quyền hệ điều hành cần thiết trước khi bắt đầu nếu phase yêu cầu.
+4. Dùng mẫu trả lời cuối checklist phase và ghi rõ `Agent không hỏi lại trong phạm vi đã duyệt; tự xử lý chi tiết kỹ thuật và tiếp tục mọi việc độc lập`.
+
+Agent phải tiếp tục các phần độc lập nếu một nhánh bị chặn. Nếu thiếu quyền, setup, quyết định sản phẩm hoặc nghiệm thu chỉ BOSS mới thực hiện được, agent ghi chính xác gate đó trong report và dừng phần phụ thuộc; không tự đoán dữ liệu/quyền để đạt chỉ tiêu `100%`. Một kiểm tra kỹ thuật thất bại sau khi đầu vào đã đủ là finding của agent để điều tra, không phải câu hỏi chuyển lại cho BOSS.
+
+Ủy quyền không tự mở rộng ra ngoài phạm vi đã chốt: không dùng cloud, tải model, đọc thêm repo/vault, cài client/cấp quyền hệ điều hành, mua tài nguyên, gửi message, push, deploy hoặc merge protected branch nếu quyền tương ứng chưa được cấp. Phase 3 vẫn phải có permission boundary cho tools có side effect; có thể duyệt trước một batch giới hạn thay vì hỏi từng thao tác nếu P3-O2/O3 đã xác định chính xác mục tiêu, loại action, thời hạn và cách thu hồi. Các bước owner nghiệm thu sau implementation vẫn cần BOSS thực hiện khi đã có artifact để kiểm tra.
+
 ## Những quyết định đã có — không cần trả lời lại
 
 - Phase 1 dùng local Ollama `qwen3.5:latest`, không cloud và không tự chuyển sang cloud khi lỗi.
