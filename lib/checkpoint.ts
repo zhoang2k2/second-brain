@@ -1,8 +1,10 @@
 // Persists in-flight assistant content at most once per interval so an abrupt
 // process exit loses only the most recent chunks.
+export const CHECKPOINT_INTERVAL_MS = 1000;
+
 export const createCheckpointer = (
   save: (content: string) => Promise<void>,
-  intervalMs = 1000,
+  intervalMs = CHECKPOINT_INTERVAL_MS,
   now: () => number = Date.now,
 ) => {
   let lastSavedAt = now();
