@@ -16,6 +16,12 @@ describe("chat source attribution", () => {
     ).toEqual(["knowledge/lesson-two.md"]);
   });
 
+  it("recognizes exact retrieved paths written without brackets", () => {
+    expect(
+      getCitedSources("Source path: knowledge/lesson-two.md", knowledge),
+    ).toEqual(["knowledge/lesson-two.md"]);
+  });
+
   it("does not attribute retrieved notes when the model omits citations", () => {
     expect(getCitedSources("Here is a general answer.", knowledge)).toEqual([]);
   });
@@ -24,5 +30,11 @@ describe("chat source attribution", () => {
     expect(getCitedSources("See [knowledge/made-up.md].", knowledge)).toEqual(
       [],
     );
+  });
+
+  it("does not match only a prefix of a retrieved path", () => {
+    expect(
+      getCitedSources("See knowledge/lesson-one.md.backup.", knowledge),
+    ).toEqual([]);
   });
 });
