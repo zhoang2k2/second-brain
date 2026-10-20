@@ -73,6 +73,26 @@ describe("knowledge helpers", () => {
     }
   });
 
+  it("refreshes the frontmatter updated timestamp on append", async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), "second-brain-"));
+    const filePath = path.join(directory, "lesson.md");
+    await writeFile(
+      filePath,
+      '---\ntitle: Lesson\nupdated: "2020-01-01T00:00:00.000Z"\n---\n\nOriginal',
+      "utf8",
+    );
+
+    try {
+      await appendLessonUpdate(filePath, "Extra");
+      const result = await readFile(filePath, "utf8");
+      expect(result).not.toContain("2020-01-01");
+      expect(result).toMatch(/^updated: "20\d\d-/m);
+      expect(result).toContain("Extra");
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
   it("rejects a duplicate lesson update submitted concurrently", async () => {
     const directory = await mkdtemp(path.join(os.tmpdir(), "second-brain-"));
     const filePath = path.join(directory, "lesson.md");

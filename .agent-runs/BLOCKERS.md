@@ -15,4 +15,4 @@
 
 ## Update 2026-10-21
 
-- MVP-03 and MVP-04 mitigated (see checkpoint report). Open: MVP-02, MVP-05, BOSS Obsidian acceptance, P1-O3. All owner-gated; nothing else blocks independent work.
+- MVP-03 and MVP-04 mitigated (see checkpoint report). Open: MVP-05, BOSS Obsidian acceptance, P1-O3. All owner-gated; nothing else blocks independent work.

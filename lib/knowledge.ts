@@ -1,11 +1,5 @@
 import { randomUUID } from "node:crypto";
-import {
-  appendFile,
-  mkdir,
-  readFile,
-  readdir,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 export type LessonInput = {
@@ -222,9 +216,13 @@ export const appendLessonUpdate = async (
     const body = existingMarkdown.replace(/^---\n[\s\S]*?\n---\n?/, "").trim();
     if (body.includes(addition)) throw new Error("LESSON_DUPLICATE_CONTENT");
     const updatedAt = new Date().toISOString();
-    await appendFile(
+    const refreshed = existingMarkdown.replace(
+      /^updated:\s*.+$/m,
+      `updated: ${JSON.stringify(updatedAt)}`,
+    );
+    await writeFile(
       filePath,
-      `\n\n## Update (${updatedAt})\n\n${addition}\n`,
+      `${refreshed.trimEnd()}\n\n## Update (${updatedAt})\n\n${addition}\n`,
       { encoding: "utf8" },
     );
   } finally {

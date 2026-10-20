@@ -16,3 +16,7 @@ format:check, lint, typecheck, test (27/27), build and `git diff --check` all pa
 ## Still open
 
 MVP-02 (frontmatter `updated` on append), MVP-05 (cold/warm and browser failure-path records), BOSS's manual Obsidian read/edit acceptance. `knowledge/hello.md` (user note) and run-state files were not committed. No push, deploy or merge.
+
+## Follow-up: MVP-02
+
+`appendLessonUpdate` now refreshes frontmatter `updated` together with the dated `## Update` section (still serialized per file; regression test added). It rewrites the file instead of appending, so an Obsidian edit landing in the same few milliseconds could be lost; acceptable for the single-user MVP. Validation after change: lint clean, 28/28 tests, build passed. Open: MVP-05 and owner acceptance.
