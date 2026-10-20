@@ -37,14 +37,22 @@ const readline = createInterface({
   terminal: Boolean(process.stdin.isTTY),
 });
 let activeController;
-readline.on("SIGINT", () => {
+let lastInterruptAt = 0;
+const handleInterrupt = () => {
+  const interruptAt = Date.now();
+  if (interruptAt - lastInterruptAt < 100) return;
+  lastInterruptAt = interruptAt;
+
   if (activeController) {
+    if (activeController.signal.aborted) return;
     activeController.abort();
     console.log("\nĐã dừng. Phần nội dung đã nhận được giữ lại.");
     return;
   }
   readline.close();
-});
+};
+readline.on("SIGINT", handleInterrupt);
+process.on("SIGINT", handleInterrupt);
 
 try {
   for await (const line of readline) {
