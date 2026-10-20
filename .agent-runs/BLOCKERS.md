@@ -2,9 +2,9 @@
 
 ## MVP
 
-- No implementation or local-runtime blocker remains for M2–M4.
+- Phase 1 is not accepted. Must fix: concurrent identical lesson additions can both succeed and duplicate the content; reproduced 3/3 times. See `.agent-runs/reports/2026-10-20-mvp-status-audit.md` for the acceptance ledger and additional findings.
 - The existing knowledge folder has been opened in Obsidian and its saved lesson is visible in the file list. Owner acceptance is pending for manually reading/editing that lesson at `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/`.
-- Partial-token cancellation against `qwen3.5:latest` was not observed: the model emitted no token before the test request was aborted. Cancellation state handling has unit coverage; repeat with a response that emits tokens before claiming live partial-stream acceptance.
+- Partial-token cancellation is now verified at API level: 36 received characters were preserved within 39 saved characters and status `interrupted`. Browser/CLI failure-state acceptance and abrupt-process-crash behavior are narrower or unverified cases; do not infer those from this API result.
 - Completion evidence is in `.agent-runs/reports/2026-10-20-mvp-completion.md`.
 
 ## Later roadmap phases

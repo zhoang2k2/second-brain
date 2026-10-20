@@ -1,6 +1,6 @@
 # Handoff
 
-M2–M4 local MVP implementation is complete on `feature/m2`. Read `.agent-runs/reports/2026-10-20-mvp-completion.md` for scope, checks, runtime evidence, limitations, and the independent review fixes.
+The project is in Phase 1 MVP stabilization and acceptance on `feature/m2`, not Phase 2. Core M2–M4 features exist, but the MVP is NOT DONE / NOT ACCEPTED. Read `.agent-runs/reports/2026-10-20-mvp-status-audit.md` first: it supersedes earlier completion wording and records a reproduced duplicate lesson-update race plus the remaining acceptance work.
 
 The folder `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/` is now registered and open in Obsidian; `hello` and `README` were visible in its file list. BOSS's manual read/edit acceptance remains. The existing user lesson was preserved and excluded from the fix commit.
 
