@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+
+import type { ChatStreamEvent } from "@/lib/chatTypes";
 import { getCitedSources } from "@/lib/citations";
 import { searchKnowledge } from "@/lib/knowledge";
 import { getOllamaBaseUrl, streamOllamaChat } from "@/lib/ollama";
@@ -6,7 +8,7 @@ import { store } from "@/lib/store";
 
 type ChatRequest = { conversationId?: string; message?: string };
 
-const encodeEvent = (event: Record<string, unknown>): Uint8Array =>
+const encodeEvent = (event: ChatStreamEvent): Uint8Array =>
   new TextEncoder().encode(`${JSON.stringify(event)}\n`);
 
 export const POST = async (request: Request) => {
@@ -76,6 +78,7 @@ export const POST = async (request: Request) => {
     (item) => item.status === "complete",
   );
   const responseController = new AbortController();
+  let completed = false;
   request.signal.addEventListener("abort", () => responseController.abort(), {
     once: true,
   });
@@ -83,6 +86,7 @@ export const POST = async (request: Request) => {
   const body = new ReadableStream<Uint8Array>({
     start(controller) {
       let content = "";
+      controller.enqueue(encodeEvent({ type: "start", message: assistant }));
       const run = async () => {
         try {
           for await (const chunk of streamOllamaChat(
@@ -93,7 +97,13 @@ export const POST = async (request: Request) => {
             knowledge,
           )) {
             content += chunk;
-            controller.enqueue(encodeEvent({ type: "delta", content: chunk }));
+            controller.enqueue(
+              encodeEvent({
+                type: "delta",
+                messageId: assistant.id,
+                content: chunk,
+              }),
+            );
           }
           const sources = getCitedSources(content, knowledge);
           await store.updateMessage(
@@ -103,9 +113,17 @@ export const POST = async (request: Request) => {
             "complete",
             sources,
           );
-          controller.enqueue(encodeEvent({ type: "done", sources }));
+          completed = true;
+          controller.enqueue(
+            encodeEvent({
+              type: "done",
+              message: { ...assistant, content, status: "complete", sources },
+              sources,
+            }),
+          );
           controller.close();
         } catch (error) {
+          if (completed) return;
           const interrupted = responseController.signal.aborted;
           await store.updateMessage(
             conversation.id,
@@ -129,7 +147,7 @@ export const POST = async (request: Request) => {
       void run();
     },
     cancel() {
-      responseController.abort();
+      if (!completed) responseController.abort();
     },
   });
 

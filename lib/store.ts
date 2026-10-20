@@ -2,25 +2,19 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-export type MessageRole = "user" | "assistant";
-export type MessageStatus = "complete" | "streaming" | "interrupted" | "error";
+import type {
+  ChatMessage,
+  Conversation,
+  MessageRole,
+  MessageStatus,
+} from "./chatTypes";
 
-export type ChatMessage = {
-  id: string;
-  role: MessageRole;
-  content: string;
-  createdAt: string;
-  status: MessageStatus;
-  sources: string[];
-};
-
-export type Conversation = {
-  id: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-  messages: ChatMessage[];
-};
+export type {
+  ChatMessage,
+  Conversation,
+  MessageRole,
+  MessageStatus,
+} from "./chatTypes";
 
 type StoreData = { version: 1; conversations: Conversation[] };
 

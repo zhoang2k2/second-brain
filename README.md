@@ -55,4 +55,6 @@ pnpm build
 
 MVP hỗ trợ Web chat streaming, CLI chat, history local, dừng response, lesson preview/confirm, Markdown keyword search và trả source paths khi dùng context từ knowledge. Chưa có cloud provider, embeddings, vector search, automatic secret redaction, đồng bộ hoặc nhiều người dùng. Lưu history dùng JSON file và khóa ghi trong một process; không thiết kế cho nhiều server process ghi chung một thư mục data.
 
-Mở `knowledge/` trong Obsidian để đọc hoặc chỉnh lesson. Người dùng cần tự kiểm tra file trong Obsidian trước khi đánh dấu nghiệm thu owner.
+Mở **Manage vaults → Open folder as vault** trong Obsidian và chọn thư mục `knowledge/` của checkout đang chạy ứng dụng. Ví dụ, bản preview MVP dùng `.worktrees/feature-m2/knowledge/`, không phải `knowledge/` ở repo gốc. Lưu một lesson tạo file Markdown trong thư mục đó; ứng dụng không tự đăng ký vault vào Obsidian. Cấu hình cá nhân `.obsidian/` được bỏ qua bởi Git.
+
+Chat tự cập nhật theo stream và hoàn tất ngay khi nhận event `done`; không cần reload trang. Request gửi Ollama gồm system instruction, tối đa 20 message history đã hoàn tất và input mới. Đây là giới hạn số message, chưa có token-budget hoặc context summarization. `temperature`, `num_ctx` và giới hạn output `num_predict` hiện chưa được ứng dụng truyền; Ollama dùng cấu hình mặc định/model tương ứng.

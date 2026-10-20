@@ -1,5 +1,5 @@
 import type { KnowledgeResult } from "./knowledge";
-import type { ChatMessage } from "./store";
+import type { ChatMessage } from "./chatTypes";
 
 export const OLLAMA_MODEL = "qwen3.5:latest";
 const DEFAULT_BASE_URL = "http://127.0.0.1:11434";
@@ -84,9 +84,11 @@ export const streamOllamaChat = async function* (
         const chunk = JSON.parse(line) as {
           message?: { content?: string };
           error?: string;
+          done?: boolean;
         };
         if (chunk.error) throw new Error(chunk.error);
         if (chunk.message?.content) yield chunk.message.content;
+        if (chunk.done) return;
       }
       if (done) break;
     }
@@ -99,6 +101,7 @@ export const streamOllamaChat = async function* (
       if (chunk.message?.content) yield chunk.message.content;
     }
   } finally {
+    await reader.cancel().catch(() => undefined);
     reader.releaseLock();
   }
 };

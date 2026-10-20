@@ -7,17 +7,12 @@ import {
   useState,
   type FormEvent,
 } from "react";
+
+import { applyChatEvent, readChatStream } from "@/lib/chatStream";
+import type { Conversation } from "@/lib/chatTypes";
+
 import { MessageContent } from "./MessageContent";
 
-type ChatMessage = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  status: "complete" | "streaming" | "interrupted" | "error";
-  sources: string[];
-};
-
-type Conversation = { id: string; title: string; messages: ChatMessage[] };
 type SearchResult = { title: string; path: string; snippet: string };
 type LessonConflict = { path: string; markdown: string };
 
@@ -110,6 +105,7 @@ export const ChatWorkspace = () => {
     const message = draft.trim();
     if (!message || busy) return;
     setError("");
+    setBusy(true);
 
     let conversation = activeConversation;
     let conversationIdForRefresh: string | undefined;
@@ -129,13 +125,13 @@ export const ChatWorkspace = () => {
             id: crypto.randomUUID(),
             role: "user",
             content: message,
+            createdAt: new Date().toISOString(),
             status: "complete",
             sources: [],
           },
         ],
       });
       setDraft("");
-      setBusy(true);
       abortController.current = new AbortController();
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -146,66 +142,13 @@ export const ChatWorkspace = () => {
       if (!response.ok || !response.body)
         throw new Error(await readError(response));
 
-      const assistantId = crypto.randomUUID();
-      setActiveConversation((current) =>
-        current?.id === conversationId
-          ? {
-              ...current,
-              messages: [
-                ...current.messages,
-                {
-                  id: assistantId,
-                  role: "assistant",
-                  content: "",
-                  status: "streaming",
-                  sources: [],
-                },
-              ],
-            }
-          : current,
-      );
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let content = "";
-      let sources: string[] = [];
-      const applyEvent = (line: string) => {
-        if (!line.trim()) return;
-        const chunk = JSON.parse(line) as {
-          type: string;
-          content?: string;
-          message?: string;
-          sources?: string[];
-        };
-        if (chunk.type === "delta" && chunk.content) content += chunk.content;
-        if (chunk.type === "done") sources = chunk.sources ?? [];
-        if (chunk.type === "error")
-          throw new Error(chunk.message ?? "Local model request failed.");
+      await readChatStream(response.body, (event) => {
         setActiveConversation((current) =>
           current?.id === conversationId
-            ? {
-                ...current,
-                messages: current.messages.map((item) =>
-                  item.id === assistantId
-                    ? { ...item, content, sources }
-                    : item,
-                ),
-              }
+            ? applyChatEvent(current, event)
             : current,
         );
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-        buffer += decoder.decode(value, { stream: !done });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        lines.forEach(applyEvent);
-        if (done) break;
-      }
-      applyEvent(buffer);
-      await openConversation(conversationId);
+      });
       await refreshConversations();
     } catch (cause) {
       if (!(cause instanceof Error && cause.name === "AbortError")) {
@@ -299,6 +242,12 @@ export const ChatWorkspace = () => {
     setError("");
   };
 
+  const conversationTitle =
+    conversations.find(
+      (conversation) => conversation.id === activeConversation?.id,
+    )?.title ??
+    activeConversation?.title ??
+    "Không gian suy nghĩ của bạn";
   const messages = activeConversation?.messages ?? [];
   const lastAssistantMessage = [...messages]
     .reverse()
@@ -417,9 +366,7 @@ export const ChatWorkspace = () => {
         <header className="ChatPanel__header">
           <div>
             <span className="ChatPanel__eyebrow">AI CÁ NHÂN</span>
-            <h1>
-              {activeConversation?.title ?? "Không gian suy nghĩ của bạn"}
-            </h1>
+            <h1>{conversationTitle}</h1>
           </div>
           <span className="ModelStatus">
             <span className="ModelStatus__dot" />

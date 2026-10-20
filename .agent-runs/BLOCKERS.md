@@ -3,7 +3,7 @@
 ## MVP
 
 - No implementation or local-runtime blocker remains for M2–M4.
-- Owner acceptance is pending: BOSS must open `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/` in Obsidian, then read and edit a reviewed saved lesson. This is the only remaining MVP acceptance action.
+- The existing knowledge folder has been opened in Obsidian and its saved lesson is visible in the file list. Owner acceptance is pending for manually reading/editing that lesson at `/Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/`.
 - Partial-token cancellation against `qwen3.5:latest` was not observed: the model emitted no token before the test request was aborted. Cancellation state handling has unit coverage; repeat with a response that emits tokens before claiming live partial-stream acceptance.
 - Completion evidence is in `.agent-runs/reports/2026-10-20-mvp-completion.md`.
 
