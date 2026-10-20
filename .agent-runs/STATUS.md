@@ -10,3 +10,4 @@
 - No push, deploy, or merge was performed. Phase 2 is not authorized by this MVP task.
 - 2026-10-21: full validation re-run on committed tree (format, lint, typecheck, test 22/22, build, diff check) passed, including the build after the race fix. See `.agent-runs/reports/2026-10-21-post-fix-validation.md`. Only owner-gated acceptance remains.
 - 2026-10-21: streaming checkpoint (MVP-04), provider-error visibility (MVP-03) and Vietnamese localization committed; 27/27 tests, build passed. See `.agent-runs/reports/2026-10-21-checkpoint-and-vi-localization.md`. Remaining: MVP-02, MVP-05, owner acceptance.
+- 2026-10-21 (later): MVP-02 closed (`updated` refreshed on append, committed in 0de6b40). Re-validated on the committed tree: format, lint, typecheck, test 28/28, build, diff check all passed. Remaining items are owner-gated only: MVP-05 browser/cold-warm acceptance records, BOSS's Obsidian read/edit acceptance, P1-O3.

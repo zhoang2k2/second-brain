@@ -11,3 +11,5 @@ The current request additionally sets `think: false` to reduce first-answer late
 Cloud remains excluded. No push, deploy, or merge was performed. Phase 2 has not been authorized.
 
 Latest: checkpointed streaming, visible provider errors and Vietnamese UI committed on `feature/m2` (report `2026-10-21-checkpoint-and-vi-localization.md`). Next independent item: MVP-02 timestamp decision; then owner acceptance.
+
+Latest (2026-10-21, later): MVP-02 is closed and the full validation suite passes (28/28 tests, build green). Nothing independent remains on `feature/m2`; next steps are owner-driven: MVP-05 acceptance records, Obsidian read/edit of a reviewed lesson, and P1-O3. Nothing was pushed, deployed or merged.

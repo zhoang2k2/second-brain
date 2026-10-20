@@ -16,3 +16,7 @@
 ## Update 2026-10-21
 
 - MVP-03 and MVP-04 mitigated (see checkpoint report). Open: MVP-05, BOSS Obsidian acceptance, P1-O3. All owner-gated; nothing else blocks independent work.
+
+## Update 2026-10-21 (later)
+
+- MVP-02 closed. No independent work remains; MVP-05 needs a live owner-driven browser/Ollama session, and Obsidian acceptance and P1-O3 need BOSS. No `blocked/*` changes were needed.
