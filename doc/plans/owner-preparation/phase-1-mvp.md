@@ -109,3 +109,31 @@ P1-O6: Agent hoàn tất phần kỹ thuật và report trước; tôi chốt ng
 ```
 
 P1-O5/O6 là việc sau implementation. Chưa làm được hai bước đó không phải lý do để agent dừng các bản sửa độc lập đã được ủy quyền.
+
+## Câu trả lời của BOSS — 2026-10-20
+
+Chốt qua hỏi–đáp trực tiếp với agent trước khi chạy không hỏi lại (YOLO). Đây là quyết định đã duyệt, không còn là gợi ý.
+
+```text
+Phase 1:
+P1-O1: Giữ nguyên scope đã duyệt.
+P1-O2: A — chưa có giới hạn latency bắt buộc; đo và báo kết quả. Agent tự chọn timeout hợp lý trong app (có nút Dừng/thử lại).
+       Test tự động dùng provider giả lập (mock); chỉ các bài nghiệm thu cuối gọi qwen3.5:latest thật.
+       Không cho tải thêm model.
+P1-O3: Crash recovery CÓ thuộc Phase 1; chấp nhận mất tối đa ~2 giây nội dung mới nhất khi process bị tắt đột ngột.
+       Agent tự chọn cách checkpoint và tự kiểm tra bằng cách kill process trong môi trường test.
+P1-O4: Agent tự tạo fixtures tổng hợp theo bảng; use case bổ sung: Không có. Không seed fixture vào vault thật.
+P1-O5: Tôi sẽ đọc/sửa note trong Obsidian sau khi agent giao bản cuối; hiện tại: Chưa thực hiện.
+P1-O6: Agent hoàn tất phần kỹ thuật và report trước; tôi chốt nghiệm thu trên đúng commit.
+
+Bổ sung:
+- Ngôn ngữ UI (Web + CLI): Tiếng Việt.
+- Naming/folder/wikilink trong knowledge/: agent tự quyết, ghi quy ước vào tài liệu.
+- Package npm: agent được tự cài khi thật cần (bản ổn định, phổ biến, license mở), ưu tiên ít dependency, ghi lý do.
+- Push/deploy/merge: Không. Chỉ commit local trên feature branch.
+- Điểm dừng: hoàn tất mọi phần kỹ thuật + acceptance matrix từng dòng, rồi ghi trạng thái `Chờ owner nghiệm thu`
+  kèm exact vault path và hướng dẫn P1-O5. Không gọi là Done.
+
+Agent không hỏi lại trong phạm vi đã duyệt; tự xử lý chi tiết kỹ thuật và tiếp tục mọi việc độc lập.
+Nếu gặp việc ngoài scope: ghi report, tiếp tục phần độc lập, không tự mở rộng quyền.
+```

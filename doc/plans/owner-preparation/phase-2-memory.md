@@ -136,3 +136,40 @@ P2-O6: MCP [Không áp dụng / tên client, version, quyền]; đích dữ li�
 P2-O7: Model/provider [tên hoặc ủy quyền có giới hạn]; cloud [Không/Có với budget]; log [loại và thời hạn].
 P2-O8: Tôi nghiệm thu lifecycle và client sau khi agent giao bản có thể thử.
 ```
+
+## Câu trả lời của BOSS — 2026-10-20
+
+Chốt qua hỏi–đáp trực tiếp với agent. Đây là quyết định đã duyệt. **Điều kiện vào phase vẫn giữ nguyên:** chỉ bắt đầu implementation Phase 2 sau khi BOSS nghiệm thu Phase 1 (P1-O5/P1-O6).
+
+Máy hiện tại khi chốt: Apple M1, RAM 16 GB, ổ đĩa trống ~7.6 GB. Agent phải kiểm tra lại dung lượng trống trước khi tải bất kỳ thứ gì.
+
+```text
+Phase 2:
+P2-O1: Có — ghi nhớ preference/decision có review; so sánh note mới/cũ phát hiện trùng và mâu thuẫn;
+       liên kết note có nguồn; cải thiện keyword retrieval và đánh giá bằng bộ câu hỏi.
+       Semantic search: theo P2-O5. MCP: Không thuộc phase.
+       Tình huống: (1) nhớ package manager tôi chọn; (2) biết một quyết định đã được thay thế;
+       (3) tìm lại lesson dù câu hỏi diễn đạt khác. Agent tạo dữ liệu tổng hợp cho cả 3.
+P2-O2: Nguồn: knowledge/ của checkout tích hợp cuối (hiện tại
+       /Users/hoang.nguyen/Personals/second-brain/.worktrees/feature-m2/knowledge/)
+       Project/nhãn: second-brain
+       Cho đọc: Có
+       Cho tạo proposal từ nội dung này: Có
+       Cho ghi sau khi tôi xác nhận: Có
+       Cho client MCP đọc: Không áp dụng
+       Các thư mục/file loại trừ: Không có
+       Đọc chéo project: Không. Một người dùng; agent tự đo quy mô vault và báo lại.
+P2-O3: Đồng ý toàn bộ bảng gợi ý, gồm lưu revision/provenance (nguồn, thời điểm, phương thức xác nhận, phiên bản).
+P2-O4: Dataset do agent tạo (20 cặp tổng hợp, gồm case không có câu trả lời và khác project), lưu lại để kiểm tra lại;
+       ngưỡng ≥16/20 đúng note trong top 3; deny case đạt 100%; note đã Quên/từ chối không xuất hiện.
+P2-O5: B — đánh giá có điều kiện, chỉ local, chi phí API = 0. Tải thêm tối đa 1 GB; RAM thêm tối đa 2 GB.
+       Chỉ bật nếu keyword không đạt P2-O4 và embeddings đạt ngưỡng tốt hơn. Không khả thi thì giữ keyword và ghi rõ.
+P2-O6: MCP Không áp dụng.
+P2-O7: Model qwen3.5:latest (local); cloud: Không. Log chỉ metadata lỗi/hành động, giữ tối đa 7 ngày,
+       không lưu nguyên prompt/answer hoặc secret. Thinking/temperature/context policy: agent đề xuất và kiểm tra trong scope.
+P2-O8: Tôi nghiệm thu lifecycle sau khi agent giao bản có thể thử.
+
+Push/deploy/merge: Không. Chỉ commit local trên feature branch.
+Agent không hỏi lại trong phạm vi đã duyệt; tự xử lý chi tiết kỹ thuật và tiếp tục mọi việc độc lập.
+Nếu gặp việc ngoài scope: ghi report, tiếp tục phần độc lập, không tự mở rộng quyền.
+```
