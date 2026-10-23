@@ -32,6 +32,23 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# local data and downloaded models
+/data/
+/models/
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-*
+/.cache/
+/knowledge/.index/
+/knowledge/.obsidian/
+/.worktrees/
+
+# Agent conversation handoffs are local; only plans under doc are trackable.
+/doc/*
+!/doc/plans/
 
 # vercel
 .vercel

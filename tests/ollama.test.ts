@@ -1,0 +1,151 @@
+import { createServer } from "node:http";
+import { afterEach, describe, expect, it } from "vitest";
+
+import type { ChatMessage } from "../lib/chatTypes";
+import { getOllamaBaseUrl, streamOllamaChat } from "../lib/ollama";
+
+const servers: ReturnType<typeof createServer>[] = [];
+
+afterEach(async () => {
+  await Promise.all(
+    servers.splice(0).map(
+      (server) =>
+        new Promise<void>((resolve) => {
+          server.closeAllConnections();
+          server.close(() => resolve());
+        }),
+    ),
+  );
+});
+
+describe("local Ollama adapter", () => {
+  it("rejects non-local provider URLs", () => {
+    expect(() => getOllamaBaseUrl("https://example.com")).toThrow(
+      "Ollama local",
+    );
+  });
+
+  it("explains how to recover when local Ollama is not running", async () => {
+    const server = createServer();
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", () => resolve()),
+    );
+    const address = server.address();
+    if (!address || typeof address === "string")
+      throw new Error("Expected a local TCP address");
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    const consume = async () => {
+      for await (const chunk of streamOllamaChat(
+        "hi",
+        [],
+        new AbortController().signal,
+        `http://127.0.0.1:${address.port}`,
+      ))
+        void chunk;
+    };
+
+    await expect(consume()).rejects.toThrow("Không kết nối được Ollama");
+  });
+
+  it("streams content from the explicitly selected local model", async () => {
+    const history: ChatMessage[] = Array.from({ length: 22 }, (_, index) => ({
+      id: `message-${index}`,
+      role: index % 2 ? "assistant" : "user",
+      content: `history-${index}`,
+      createdAt: "2026-10-20T00:00:00.000Z",
+      status: "complete",
+      sources: [],
+    }));
+    let requestBody = "";
+    let requestPath: string | undefined;
+    const server = createServer((request, response) => {
+      requestPath = request.url;
+      let body = "";
+      request.on("data", (chunk: Buffer) => (body += chunk.toString()));
+      request.on("end", () => {
+        requestBody = body;
+        response.writeHead(200, { "content-type": "application/x-ndjson" });
+        response.end(
+          '{"message":{"content":"hello"},"done":false}\n{"message":{"content":" world"},"done":true}\n',
+        );
+      });
+    });
+    servers.push(server);
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", () => resolve()),
+    );
+    const address = server.address();
+    if (!address || typeof address === "string")
+      throw new Error("Expected a local TCP address");
+
+    const chunks = [];
+    for await (const chunk of streamOllamaChat(
+      "hello",
+      history,
+      new AbortController().signal,
+      `http://127.0.0.1:${address.port}`,
+    )) {
+      chunks.push(chunk);
+    }
+
+    const payload = JSON.parse(requestBody) as {
+      model: string;
+      stream: boolean;
+      think: boolean;
+      messages: { role: string; content: string }[];
+    };
+    expect(requestPath).toBe("/api/chat");
+    expect(payload.model).toBe("qwen3.5:latest");
+    expect(payload.stream).toBe(true);
+    expect(payload.think).toBe(false);
+    expect(payload.messages).toHaveLength(22);
+    expect(payload.messages[1]).toEqual({ role: "user", content: "history-2" });
+    expect(payload.messages.at(-1)).toEqual({ role: "user", content: "hello" });
+    expect(payload).not.toHaveProperty("options");
+    expect(chunks).toEqual(["hello", " world"]);
+  });
+
+  it("finishes when Ollama sends done even if the transport stays open", async () => {
+    const server = createServer((request, response) => {
+      request.resume();
+      response.writeHead(200, { "content-type": "application/x-ndjson" });
+      response.write('{"message":{"content":"Complete"},"done":true}\n');
+    });
+    servers.push(server);
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", resolve),
+    );
+    const address = server.address();
+    if (!address || typeof address === "string")
+      throw new Error("Expected TCP address");
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const consume = async () => {
+      const chunks = [];
+      for await (const chunk of streamOllamaChat(
+        "hello",
+        [],
+        new AbortController().signal,
+        `http://127.0.0.1:${address.port}`,
+      ))
+        chunks.push(chunk);
+      return chunks;
+    };
+
+    try {
+      const result = await Promise.race([
+        consume(),
+        new Promise<never>((_resolve, reject) => {
+          timeout = setTimeout(
+            () => reject(new Error("Still waiting after done")),
+            500,
+          );
+        }),
+      ]);
+      expect(result).toEqual(["Complete"]);
+    } finally {
+      clearTimeout(timeout);
+    }
+  });
+});
